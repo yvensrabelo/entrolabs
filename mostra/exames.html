@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exames — TC de crânio e radiografia de tórax</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #fff; color: #111827; font: 13px/1.45 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button { font: inherit; }
+  #app { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 100vh; }
+  #app > * { min-width: 0; }
+  section { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+  section > :not(h2):not(.sub):not(.cred) { max-width: 460px; }
+  section + section { border-left: 1px solid #e5e7eb; }
+  h2 { font-size: 15px; font-weight: 700; margin: 0; }
+  .sub { color: #6b7280; margin: 0; font-size: 12px; }
+  .stage { position: relative; width: 100%; max-width: 460px; background: #000; border-radius: 10px; overflow: hidden; user-select: none; touch-action: none; }
+  .stage canvas, .stage img { display: block; width: 100%; height: auto; }
+  .ov { position: absolute; left: 10px; right: 10px; bottom: 8px; display: flex; justify-content: space-between; gap: 8px; color: #fff; font-size: 12px; text-shadow: 0 1px 2px rgba(0,0,0,.8); pointer-events: none; }
+  .ov b { font-weight: 600; }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .k { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; min-width: 56px; }
+  .seg { display: inline-flex; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; background: #fff; padding: 6px 10px; cursor: pointer; color: #374151; border-right: 1px solid #e5e7eb; }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: #111827; color: #fff; }
+  input[type=range] { width: 100%; max-width: 460px; accent-color: #111827; }
+  .mini { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font-size: 12px; color: #374151; }
+  .mini span:last-child { font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; color: #6b7280; }
+  .btn { padding: 7px 12px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; color: #111827; }
+  .btn:hover { border-color: #9ca3af; }
+  .btn.primary { background: #111827; color: #fff; border-color: #111827; }
+  .pin { position: absolute; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%; background: #fff; color: #111827; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 0 2px #111827, 0 1px 4px rgba(0,0,0,.5); }
+  .pin.hit { background: #10b981; color: #fff; box-shadow: 0 0 0 2px #fff; }
+  .pin.miss { background: #ef4444; color: #fff; box-shadow: 0 0 0 2px #fff; }
+  .tip { position: absolute; transform: translate(-50%, -140%); background: #fff; border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: 600; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+  .mark { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; border: 2px solid #ef4444; pointer-events: none; }
+  .quiz { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; display: none; flex-direction: column; gap: 6px; }
+  .quiz.on { display: flex; }
+  .quiz .q { font-size: 14px; }
+  .quiz .q b { font-weight: 700; }
+  .quiz .r { color: #374151; min-height: 18px; }
+  .quiz .r.ok { color: #047857; } .quiz .r.bad { color: #b91c1c; }
+  .lista { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; font-size: 12px; color: #374151; }
+  .lista li b { font-weight: 600; color: #111827; margin-right: 4px; }
+  .cred { font-size: 11px; color: #6b7280; margin-top: auto; padding-top: 8px; }
+  .cred a { color: inherit; }
+  @media (max-width: 760px) {
+    #app { grid-template-columns: 1fr; }
+    section + section { border-left: 0; border-top: 1px solid #e5e7eb; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <section>
+    <h2>Tomografia de crânio — navegar pelos cortes</h2>
+    <p class="sub">34 cortes axiais. Arraste o controle, role o mouse ou arraste para cima e para baixo sobre a imagem. A janela remapeia o brilho dos pixels.</p>
+    <div class="stage" id="ctStage">
+      <canvas id="ct" width="512" height="512"></canvas>
+      <div class="ov"><span id="ctLabel"></span><b id="ctLevel"></b></div>
+    </div>
+    <input type="range" id="ctSlider" min="0" max="33" value="12" aria-label="Corte">
+    <div class="row"><span class="k">Janela</span>
+      <div class="seg" id="ctWin">
+        <button data-w="orig">Original</button>
+        <button data-w="brain" class="on">Cérebro</button>
+        <button data-w="soft">Partes moles</button>
+        <button data-w="bone">Osso</button>
+      </div>
+    </div>
+    <div class="mini"><span>Centro</span><input type="range" id="wc" min="0" max="255" value="120"><span id="wcV">120</span></div>
+    <div class="mini"><span>Largura</span><input type="range" id="ww" min="2" max="255" value="110"><span id="wwV">110</span></div>
+    <div class="cred">Imagens: Wikimedia Commons, CC BY-SA. Os cortes são JPEG de 8 bits já janelados na origem; a janela aqui é uma reamostragem didática, não Hounsfield real. Rótulo de nível anatômico aproximado, por faixa de cortes.</div>
+  </section>
+
+  <section>
+    <h2>Radiografia de tórax PA — camada de anatomia</h2>
+    <p class="sub">Ligue os pinos para ver as estruturas ou use o modo “Encontre a estrutura” e clique onde ela está.</p>
+    <div class="stage" id="rxStage">
+      <img id="rx" src="./img/rx_torax.png" alt="Radiografia de tórax PA" draggable="false">
+    </div>
+    <div class="row">
+      <button class="btn" id="rxToggle">Mostrar estruturas</button>
+      <button class="btn primary" id="rxQuiz">Encontre a estrutura</button>
+      <span id="rxScore" style="color:#6b7280"></span>
+    </div>
+    <div class="quiz" id="quiz">
+      <div class="q">Onde está: <b id="qName"></b>?</div>
+      <div class="r" id="qRes"></div>
+      <div class="row"><button class="btn" id="qNext">Próxima</button><button class="btn" id="qStop">Sair do modo</button></div>
+    </div>
+    <ul class="lista" id="rxList"></ul>
+    <div class="cred">Imagem: Wikimedia Commons, domínio público. Posições dos pinos definidas manualmente.</div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- TC ---------- */
+const N = 34;
+const CT_LEVELS = [
+  [0, 6, 'base do crânio · órbitas · cerebelo'],
+  [7, 13, 'fossa posterior · tronco encefálico · lobos temporais'],
+  [14, 20, 'ventrículos laterais · núcleos da base'],
+  [21, 27, 'centro semioval · convexidade'],
+  [28, 33, 'vértice'],
+];
+const WIN = { orig: [128, 256], brain: [125, 180], soft: [110, 220], bone: [225, 70] };
+const imgs = [], cv = document.getElementById('ct'), cx = cv.getContext('2d', { willReadFrequently: true });
+const sl = document.getElementById('ctSlider'), wc = document.getElementById('wc'), ww = document.getElementById('ww');
+let cur = 12;
+for (let i = 0; i < N; i++) { const im = new Image(); im.src = `./img/ct/${String(i).padStart(2, '0')}.jpg`; im.onload = () => { if (i === cur) draw(); }; imgs.push(im); }
+
+function lut() {
+  const c = +wc.value, w = +ww.value, lo = c - w / 2, t = new Uint8ClampedArray(256);
+  for (let v = 0; v < 256; v++) t[v] = ((v - lo) / w) * 255;
+  return t;
+}
+function draw() {
+  const im = imgs[cur]; if (!im.complete || !im.naturalWidth) return;
+  cx.drawImage(im, 0, 0, 512, 512);
+  if (!(+wc.value === 128 && +ww.value === 256)) {
+    const id = cx.getImageData(0, 0, 512, 512), d = id.data, t = lut();
+    for (let p = 0; p < d.length; p += 4) { const v = t[d[p]]; d[p] = d[p + 1] = d[p + 2] = v; }
+    cx.putImageData(id, 0, 0);
+  }
+  document.getElementById('ctLabel').textContent = `Corte ${cur + 1} / ${N}`;
+  const lv = CT_LEVELS.find(([a, b]) => cur >= a && cur <= b);
+  document.getElementById('ctLevel').textContent = lv ? lv[2] : '';
+}
+function show(i) { cur = Math.max(0, Math.min(N - 1, i)); sl.value = cur; draw(); }
+sl.addEventListener('input', () => show(+sl.value));
+const stage = document.getElementById('ctStage');
+stage.addEventListener('wheel', (e) => { e.preventDefault(); show(cur + Math.sign(e.deltaY)); }, { passive: false });
+let dy = null;
+stage.addEventListener('pointerdown', (e) => { dy = e.clientY; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener('pointermove', (e) => { if (dy == null) return; const d = e.clientY - dy; if (Math.abs(d) > 10) { show(cur + Math.sign(d)); dy = e.clientY; } });
+stage.addEventListener('pointerup', () => dy = null);
+stage.addEventListener('pointercancel', () => dy = null);
+window.addEventListener('keydown', (e) => { if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') show(cur - 1); if (e.key === 'ArrowDown' || e.key === 'ArrowRight') show(cur + 1); });
+
+function setWin(k) {
+  const [c, w] = WIN[k]; wc.value = c; ww.value = w; syncWin();
+  document.querySelectorAll('#ctWin button').forEach(b => b.classList.toggle('on', b.dataset.w === k));
+}
+function syncWin() { document.getElementById('wcV').textContent = wc.value; document.getElementById('wwV').textContent = ww.value; draw(); }
+document.getElementById('ctWin').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setWin(b.dataset.w); });
+[wc, ww].forEach(r => r.addEventListener('input', () => { document.querySelectorAll('#ctWin button').forEach(b => b.classList.remove('on')); syncWin(); }));
+setWin('brain');
+
+/* ---------- RX ---------- */
+const RX_PINS = [
+  { n: 'Traqueia', x: 50, y: 18 },
+  { n: 'Clavícula esquerda', x: 66, y: 20 },
+  { n: 'Arco aórtico', x: 44, y: 34 },
+  { n: 'Hilo pulmonar direito', x: 40, y: 47 },
+  { n: 'Silhueta cardíaca', x: 52, y: 58 },
+  { n: 'Cúpula diafragmática direita', x: 34, y: 72 },
+  { n: 'Seio costofrênico direito', x: 24, y: 78 },
+  { n: 'Bolha gástrica', x: 66, y: 80 },
+];
+const rxStage = document.getElementById('rxStage'), rxImg = document.getElementById('rx');
+const rxList = document.getElementById('rxList'), quiz = document.getElementById('quiz');
+let pinsOn = false, quizOn = false, qIdx = -1, score = { ok: 0, n: 0 }, answered = false;
+rxList.innerHTML = RX_PINS.map((p, i) => `<li><b>${i + 1}</b>${p.n}</li>`).join('');
+
+function clearLayer() { rxStage.querySelectorAll('.pin, .tip, .mark').forEach(n => n.remove()); }
+function addPin(p, i, cls) {
+  const el = document.createElement('div'); el.className = 'pin' + (cls ? ' ' + cls : ''); el.textContent = i + 1;
+  el.style.left = p.x + '%'; el.style.top = p.y + '%';
+  el.addEventListener('click', (e) => { e.stopPropagation(); rxStage.querySelectorAll('.tip').forEach(n => n.remove()); const t = document.createElement('div'); t.className = 'tip'; t.textContent = p.n; t.style.left = p.x + '%'; t.style.top = p.y + '%'; rxStage.appendChild(t); });
+  rxStage.appendChild(el); return el;
+}
+function renderPins() { clearLayer(); if (pinsOn) RX_PINS.forEach((p, i) => addPin(p, i)); }
+document.getElementById('rxToggle').addEventListener('click', (e) => {
+  if (quizOn) stopQuiz();
+  pinsOn = !pinsOn; e.target.textContent = pinsOn ? 'Ocultar estruturas' : 'Mostrar estruturas'; renderPins();
+});
+
+function nextQ() {
+  let i; do { i = Math.floor(Math.random() * RX_PINS.length); } while (i === qIdx && RX_PINS.length > 1);
+  qIdx = i; answered = false; clearLayer();
+  document.getElementById('qName').textContent = RX_PINS[i].n;
+  const r = document.getElementById('qRes'); r.textContent = 'Clique na radiografia.'; r.className = 'r';
+}
+function startQuiz() {
+  quizOn = true; pinsOn = false; document.getElementById('rxToggle').textContent = 'Mostrar estruturas';
+  quiz.classList.add('on'); score = { ok: 0, n: 0 }; updScore(); nextQ();
+}
+function stopQuiz() { quizOn = false; quiz.classList.remove('on'); clearLayer(); }
+function updScore() { document.getElementById('rxScore').textContent = score.n ? `${score.ok} / ${score.n} acertos` : ''; }
+document.getElementById('rxQuiz').addEventListener('click', startQuiz);
+document.getElementById('qNext').addEventListener('click', nextQ);
+document.getElementById('qStop').addEventListener('click', stopQuiz);
+rxStage.addEventListener('click', (e) => {
+  if (!quizOn || answered) return;
+  const b = rxImg.getBoundingClientRect();
+  const x = (e.clientX - b.left) / b.width * 100, y = (e.clientY - b.top) / b.height * 100;
+  const p = RX_PINS[qIdx], d = Math.hypot(x - p.x, y - p.y);
+  answered = true; score.n++;
+  const ok = d < 7; if (ok) score.ok++; updScore();
+  const m = document.createElement('div'); m.className = 'mark'; m.style.left = x + '%'; m.style.top = y + '%'; rxStage.appendChild(m);
+  addPin(p, qIdx, ok ? 'hit' : 'miss');
+  const r = document.getElementById('qRes');
+  r.textContent = ok ? 'Certo.' : `Não. A estrutura está no pino marcado em vermelho.`; r.className = 'r ' + (ok ? 'ok' : 'bad');
+});
+</script>
+</body>
+</html>

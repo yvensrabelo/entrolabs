@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mostra Imagem — ENTROLABS</title>
+<meta name="description" content="Mostra comparativa de visualizadores abertos de exames de imagem: tomografia, ressonância e radiografia.">
+<link rel="stylesheet" href="./shared.css">
+<style>
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 48px; }
+  .wrap > p.lead { color: var(--muted); max-width: 720px; margin-bottom: 24px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 8px; background: #fff; }
+  .card h3 { font-size: 16px; }
+  .card .src { font-size: 12px; color: var(--muted); }
+  .card .cov { font-size: 13px; color: #374151; }
+  .card .feat { font-size: 13px; color: #374151; margin: 0; padding-left: 16px; }
+  .card .lic { font-size: 11px; color: var(--muted); }
+  .card .lic b { color: var(--text); font-weight: 600; }
+  .card .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 8px; }
+  .btn { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font: inherit; font-size: 13px; cursor: pointer; color: var(--text); }
+  .btn:hover { border-color: #9ca3af; }
+  .btn.primary { background: var(--text); color: #fff; border-color: var(--text); }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--muted); white-space: nowrap; }
+  .badge.ok { background: #ecfdf5; color: #047857; }
+  .badge.warn { background: #fffbeb; color: #b45309; }
+
+  .viewer { position: fixed; inset: 0; top: 52px; background: #fff; z-index: 4; display: none; flex-direction: column; }
+  .viewer.open { display: flex; }
+  .viewer .bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .viewer .bar b { font-weight: 600; }
+  .viewer .bar .sp { flex: 1; }
+  .viewer .bar a { color: var(--muted); text-decoration: underline; }
+  .viewer iframe { flex: 1; border: 0; width: 100%; }
+  .viewer .loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--muted); font-size: 13px; pointer-events: none; }
+  @media (max-width: 900px) { .wrap { padding: 20px 16px 40px; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="./">ENTROLABS</a>
+  <nav class="tabs" aria-label="Experimentos">
+    <a class="tab" href="./">Corpo 3D</a>
+    <a class="tab" href="./corpo2d.html">Corpo 2D</a>
+    <a class="tab" href="./mostra.html">Mostra 3D</a>
+    <a class="tab on" href="./mostra-imagem.html" aria-current="page">Mostra Imagem</a>
+  </nav>
+</header>
+
+<section class="wrap">
+  <h1 style="font-size:22px;font-weight:700;margin-bottom:6px">Visualizadores abertos de exames de imagem</h1>
+  <p class="lead">Candidatos a base do Simulador 02 (tomografia, ressonância, radiografia), cada um do jeito que o autor publicou. Os que aceitam ser embutidos abrem dentro desta página. Os demais abrem em nova aba.</p>
+  <div class="cards" id="cards"></div>
+</section>
+
+<div class="viewer" id="viewer">
+  <div class="bar">
+    <button class="btn" id="close">← Voltar à mostra</button>
+    <b id="vtitle"></b>
+    <span class="sp"></span>
+    <a id="vlink" href="#" target="_blank" rel="noopener">abrir em nova aba</a>
+  </div>
+  <div class="loading" id="vload">Carregando o visualizador. Volumes de ressonância e tomografia levam alguns segundos.</div>
+  <iframe id="frame" title="Visualizador de imagem" allow="fullscreen"></iframe>
+</div>
+
+<script>
+// abrir: [{ t: rótulo do botão, url }] — cada um abre no iframe. Sem "abrir", o candidato fica só como link.
+const ITEMS = [
+  {
+    id: 'exames', nome: 'Visualizador próprio (ENTROLABS)', src: 'Montado aqui · imagens do Wikimedia Commons',
+    cov: 'TC de crânio com 34 cortes axiais e radiografia de tórax PA com 8 estruturas marcadas.',
+    feat: ['Navegar cortes com roda, arraste, teclado ou controle', 'Janela: cérebro, partes moles, osso e ajuste manual', 'Rótulo do nível anatômico por faixa de cortes', 'Radiografia com pinos e modo “encontre a estrutura”'],
+    lic: 'TC CC BY-SA · RX domínio público', peso: 'leve (2 MB)',
+    url: './mostra/exames.html', repo: 'https://github.com/yvensrabelo/entrolabs',
+    abrir: [{ t: 'Abrir aqui', url: './mostra/exames.html' }],
+  },
+  {
+    id: 'niivue', nome: 'NiiVue', src: 'Universidade da Carolina do Sul · Chris Rorden e equipe',
+    cov: 'Volumes NIfTI, NRRD, DICOM e malhas. Três planos, render 3D, planos de corte, atlas com rótulo por voxel, desenho de segmentação.',
+    feat: ['Axial, coronal e sagital sincronizados com 3D', 'Rótulo da estrutura sob o cursor (atlas)', 'Planos de corte no volume 3D', 'Leve: WebGL2 puro, sem framework', 'Candidato principal a base do simulador'],
+    lic: 'Código BSD 2-Clause · dados das demos: RM de exemplo dos autores', peso: 'leve (demos de 5 a 30 MB)',
+    url: 'https://niivue.com/demos/', repo: 'https://github.com/niivue/niivue',
+    abrir: [
+      { t: 'Multiplanar', url: 'https://niivue.com/demos/features/basic.multiplanar.html' },
+      { t: 'Atlas (rótulo por voxel)', url: 'https://niivue.com/demos/features/atlas.html' },
+      { t: 'Planos de corte 3D', url: 'https://niivue.com/demos/features/clipplanes.html' },
+    ],
+  },
+  {
+    id: 'openanatomy', nome: 'Open Anatomy Browser', src: 'Brigham and Women’s Hospital / Harvard (SPL)',
+    cov: 'Atlas por região com RM ou TC e modelos 3D das estruturas: cérebro (300+), abdome, joelho, fígado, cabeça e pescoço, ouvido interno, tórax.',
+    feat: ['Corte de RM ou TC sincronizado com o 3D', 'Hierarquia de estruturas, clique com nome', 'Referência para a correlação 2D ↔ 3D do simulador'],
+    lic: 'Atlas SPL: licença livre para uso e redistribuição (3D Slicer) · código MIT', peso: 'médio (cada atlas 20 a 60 MB)',
+    url: 'https://www.openanatomy.org/atlas-pages/', repo: 'https://github.com/mhalle/oabrowser',
+    abrir: [
+      { t: 'Cérebro', url: 'https://www.openanatomy.org/atlases/nac/brain-2017-01/viewer/' },
+      { t: 'Abdome', url: 'https://www.openanatomy.org/atlases/nac/abdomen-2016-09/viewer/' },
+      { t: 'Joelho', url: 'https://www.openanatomy.org/atlases/nac/knee-2016-09/viewer/' },
+    ],
+  },
+  {
+    id: 'papaya', nome: 'Papaya', src: 'Research Imaging Institute, UT Health San Antonio',
+    cov: 'Visualizador de NIfTI e DICOM com três planos, sobreposição de atlas e séries temporais.',
+    feat: ['Axial, coronal e sagital', 'Arrastar arquivo local para abrir', 'Sem render 3D', 'Projeto maduro, pouco atualizado'],
+    lic: 'Código BSD 3-Clause', peso: 'leve',
+    url: 'https://papaya.greenant.net/', repo: 'https://github.com/rii-mango/Papaya',
+    abrir: [{ t: 'Abrir aqui', url: 'https://papaya.greenant.net/' }],
+    nota: 'instância pública mantida por terceiro; abre vazio, use o menu File ou arraste um NIfTI/DICOM',
+  },
+  {
+    id: 'ohif', nome: 'OHIF Viewer', src: 'Open Health Imaging Foundation · Cornerstone3D',
+    cov: 'Padrão de radiologia web: DICOMweb, MPR, volume 3D, medições, segmentação, estudos reais de exemplo.',
+    feat: ['Interface completa de estação de laudo', 'Pesado para embutir no site', 'Serve quando houver DICOM real'],
+    lic: 'Código MIT', peso: 'pesado',
+    url: 'https://viewer.ohif.org/', repo: 'https://github.com/OHIF/Viewers',
+    bloqueio: 'X-Frame-Options: DENY',
+  },
+];
+
+const cards = document.getElementById('cards');
+for (const it of ITEMS) {
+  const c = document.createElement('article');
+  c.className = 'card'; c.id = 'card-' + it.id;
+  const badge = it.abrir ? '<span class="badge ok">roda aqui</span>' : `<span class="badge warn">nova aba · ${it.bloqueio}</span>`;
+  c.innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h3>${it.nome}</h3>${badge}</div>
+    <div class="src">${it.src}${it.nota ? ' · ' + it.nota : ''}</div>
+    <div class="cov">${it.cov}</div>
+    <ul class="feat">${it.feat.map(f => `<li>${f}</li>`).join('')}</ul>
+    <div class="lic"><b>Licença:</b> ${it.lic} · <b>Peso:</b> ${it.peso}</div>
+    <div class="row">
+      ${(it.abrir || []).map((a, i) => `<button class="btn primary" data-open="${it.id}" data-i="${i}">${a.t}</button>`).join('')}
+      <a class="btn" href="${it.url}" target="_blank" rel="noopener">${it.abrir ? 'Nova aba' : 'Abrir'}</a>
+      <a class="btn" href="${it.repo}" target="_blank" rel="noopener">Código / fonte</a>
+    </div>`;
+  cards.appendChild(c);
+}
+
+const viewer = document.getElementById('viewer');
+const frame = document.getElementById('frame');
+const vload = document.getElementById('vload');
+function open(id, i = 0) {
+  const it = ITEMS.find(x => x.id === id); if (!it || !it.abrir) return;
+  const a = it.abrir[i] || it.abrir[0];
+  document.getElementById('vtitle').textContent = it.nome + (it.abrir.length > 1 ? ' · ' + a.t : '');
+  document.getElementById('vlink').href = a.url;
+  vload.style.display = 'block';
+  frame.src = a.url;
+  viewer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.replaceState(null, '', '#' + id + (i ? '-' + i : ''));
+}
+function close() {
+  viewer.classList.remove('open'); frame.src = 'about:blank';
+  document.body.style.overflow = ''; history.replaceState(null, '', location.pathname);
+}
+cards.addEventListener('click', (e) => { const b = e.target.closest('[data-open]'); if (b) open(b.dataset.open, +b.dataset.i); });
+document.getElementById('close').addEventListener('click', close);
+frame.addEventListener('load', () => { if (frame.src !== 'about:blank') vload.style.display = 'none'; });
+if (location.hash) { const [id, i] = location.hash.slice(1).split('-'); open(id, +(i || 0)); }
+</script>
+</body>
+</html>
