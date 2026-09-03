@@ -9,7 +9,8 @@ Site de experimentos interativos. Fundo branco, abas no topo para escolher o exp
 
 | Aba | Arquivos | O que é |
 |---|---|---|
-| Corpo humano | `index.html`, `corpo.js` | Figura 2D em SVG com 7 sistemas e 21 partes clicáveis; cada parte mostra função e uma curiosidade |
+| Corpo 3D (inicial) | `index.html`, `corpo3d.js`, `corpo3d.css`, `models/za/`, `draco/` | Corpo humano 3D do Z-Anatomy: 9 sistemas carregados sob demanda, 5.451 estruturas com nome PT/latim/TA2 e definição, 1.564 acidentes ósseos como pinos, busca, hierarquia, isolar, corte. Portado do repositório `plataforma-medicina` |
+| Corpo 2D | `corpo2d.html`, `corpo.js` | Figura 2D em SVG com 7 sistemas e 21 partes clicáveis; cada parte mostra função e uma curiosidade |
 | Mostra 3D | `mostra.html`, `mostra/hubmap.html` | Mostra comparativa de atlas 3D abertos: três visualizadores da comunidade embutidos (iframe das demos originais), visualizador próprio dos órgãos HuBMAP (three.js + GLB via CDN), links para Open Anatomy (Harvard) e Z-Anatomy (instalador Windows) |
 
 ## Estrutura

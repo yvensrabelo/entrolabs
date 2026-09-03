@@ -4,38 +4,74 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ENTROLABS</title>
-<meta name="description" content="Experimentos interativos. Corpo humano: partes e sistemas.">
+<meta name="description" content="Corpo humano 3D por sistemas: 5.451 estruturas com nome em português, latim e definição; acidentes ósseos clicáveis. Modelos Z-Anatomy (CC BY-SA 4.0).">
 <meta name="theme-color" content="#ffffff">
 <link rel="stylesheet" href="./shared.css">
+<link rel="stylesheet" href="./corpo3d.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 </head>
 <body>
 
 <header class="top">
   <a class="brand" href="./">ENTROLABS</a>
   <nav class="tabs" aria-label="Experimentos">
-    <a class="tab on" href="./" aria-current="page">Corpo humano</a>
+    <a class="tab on" href="./" aria-current="page">Corpo 3D</a>
+    <a class="tab" href="./corpo2d.html">Corpo 2D</a>
     <a class="tab" href="./mostra.html">Mostra 3D</a>
   </nav>
 </header>
 
-<main class="app">
-  <aside class="side left">
-    <h2>Sistemas</h2>
-    <div class="chips" id="systems"></div>
-    <h2>Partes</h2>
-    <ul class="parts" id="parts"></ul>
+<main class="c3d">
+  <aside class="c3d-side c3d-left">
+    <div class="blk">
+      <input id="search" class="input" placeholder="Buscar estrutura (fêmur, deltoide, aorta…)" autocomplete="off" aria-label="Buscar estrutura">
+      <div id="results" class="results"></div>
+    </div>
+
+    <div class="blk">
+      <h2>Sistemas <span class="muted" id="total"></span></h2>
+      <div id="sets" class="sets"></div>
+    </div>
+
+    <div class="blk">
+      <h2>Vista</h2>
+      <label class="switch"><input type="checkbox" id="allPins"><span>Mostrar todos os acidentes ósseos</span></label>
+      <label class="lbl" for="clip">Corte anteroposterior</label>
+      <input type="range" id="clip" min="0" max="100" value="100">
+      <div class="row">
+        <button class="btn" id="reset">Reiniciar vista</button>
+        <button class="btn" id="isolate" disabled>Isolar seleção</button>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h2>Hierarquia</h2>
+      <select id="treeSet" class="input" aria-label="Sistema da hierarquia"></select>
+      <div id="tree" class="tree"></div>
+    </div>
+
+    <p class="cred">Modelos: Z-Anatomy (CC BY-SA 4.0), derivado do BodyParts3D. Nomes em português da Terminologia Anatômica (TA2). Visualizador: three.js + Draco.</p>
   </aside>
 
-  <section class="stage">
-    <div class="figure" id="figure"></div>
-    <div class="hint" id="hint">Toque em uma parte do corpo</div>
+  <section class="c3d-stage">
+    <div id="three" class="three"></div>
+    <div id="lmBar" class="lm-bar" hidden>
+      <span>Acidentes ósseos de <b id="lmName"></b>. Clique nos pinos.</span>
+      <button class="btn" id="lmBack">Voltar</button>
+    </div>
+    <div id="loader" class="loader"><div class="spin"></div><div id="loaderText">Carregando esqueleto…</div></div>
   </section>
 
-  <aside class="side right" id="info">
-    <div class="info-empty">Selecione uma parte para ver o que ela faz.</div>
+  <aside class="c3d-side c3d-right" id="info">
+    <div class="info-empty">Toque numa estrutura do corpo, ou use a busca e a hierarquia.</div>
   </aside>
 </main>
 
-<script type="module" src="./corpo.js"></script>
+<script type="module" src="./corpo3d.js"></script>
 </body>
 </html>
