@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mostra 3D — ENTROLABS</title>
+<meta name="description" content="Mostra comparativa de atlas 3D abertos do corpo humano.">
+<link rel="stylesheet" href="./shared.css">
+<style>
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 48px; }
+  .wrap > p.lead { color: var(--muted); max-width: 720px; margin-bottom: 24px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 8px; background: #fff; }
+  .card.on { border-color: var(--text); box-shadow: 0 0 0 1px var(--text); }
+  .card h3 { font-size: 16px; }
+  .card .src { font-size: 12px; color: var(--muted); }
+  .card .cov { font-size: 13px; color: #374151; }
+  .card .feat { font-size: 13px; color: #374151; margin: 0; padding-left: 16px; }
+  .card .lic { font-size: 11px; color: var(--muted); }
+  .card .lic b { color: var(--text); font-weight: 600; }
+  .card .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 8px; }
+  .btn { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font: inherit; font-size: 13px; cursor: pointer; color: var(--text); }
+  .btn:hover { border-color: #9ca3af; }
+  .btn.primary { background: var(--text); color: #fff; border-color: var(--text); }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--muted); }
+  .badge.ok { background: #ecfdf5; color: #047857; }
+  .badge.warn { background: #fffbeb; color: #b45309; }
+  .badge.off { background: #fef2f2; color: #b91c1c; }
+
+  .viewer { position: fixed; inset: 0; top: 52px; background: #fff; z-index: 4; display: none; flex-direction: column; }
+  .viewer.open { display: flex; }
+  .viewer .bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .viewer .bar b { font-weight: 600; }
+  .viewer .bar .sp { flex: 1; }
+  .viewer .bar a { color: var(--muted); text-decoration: underline; }
+  .viewer iframe { flex: 1; border: 0; width: 100%; }
+  .viewer .loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--muted); font-size: 13px; pointer-events: none; }
+  @media (max-width: 900px) { .wrap { padding: 20px 16px 40px; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="./">ENTROLABS</a>
+  <nav class="tabs" aria-label="Experimentos">
+    <a class="tab" href="./">Corpo humano</a>
+    <a class="tab on" href="./mostra.html" aria-current="page">Mostra 3D</a>
+  </nav>
+</header>
+
+<section class="wrap">
+  <h1 style="font-size:22px;font-weight:700;margin-bottom:6px">Atlas 3D abertos do corpo humano</h1>
+  <p class="lead">Cada candidato aparece aqui do jeito que o autor publicou, sem alteração, para comparar nas mesmas condições. Os que rodam no navegador abrem dentro desta página. Os demais abrem em nova aba ou são baixados.</p>
+  <div class="cards" id="cards"></div>
+</section>
+
+<div class="viewer" id="viewer">
+  <div class="bar">
+    <button class="btn" id="close">← Voltar à mostra</button>
+    <b id="vtitle"></b>
+    <span class="sp"></span>
+    <a id="vlink" href="#" target="_blank" rel="noopener">abrir em nova aba</a>
+  </div>
+  <div class="loading" id="vload">Carregando modelos 3D. Os mais pesados levam alguns segundos.</div>
+  <iframe id="frame" title="Visualizador 3D" allow="fullscreen"></iframe>
+</div>
+
+<script>
+const ITEMS = [
+  {
+    id: 'jixiangying', nome: 'Anatomy Viewer (jixiangying)', src: 'Comunidade · dados BodyParts3D 4.0 (Univ. Tóquio)',
+    cov: '11 sistemas, 2.234 estruturas. Esqueleto osso por osso, incluindo cada vértebra.',
+    feat: ['Clique com nome da estrutura', 'Busca global', 'Liga e desliga cada sistema', 'Destaque com o resto esmaecido', 'Rótulos em inglês e chinês'],
+    lic: 'Código MIT · modelos CC BY-SA 2.1 JP', peso: 'pesado (~150 MB de modelos)',
+    url: 'https://jixiangying.github.io/anatomy/', repo: 'https://github.com/jixiangying/anatomy', embed: true,
+  },
+  {
+    id: 'bodyexplorer', nome: 'BodyExplorer (Johan Bellander)', src: 'Comunidade · dados BodyParts3D e Z-Anatomy',
+    cov: '467 estruturas: músculos, tendões e esqueleto de 201 ossos.',
+    feat: ['Clique no músculo com nome, grupo e link', '14 grupos musculares', 'Esconder camada por camada', 'Transparência de músculo e osso'],
+    lic: 'Código MIT · modelos CC BY-SA', peso: 'médio',
+    url: 'https://johanbellander.github.io/BodyExplorer/', repo: 'https://github.com/JohanBellander/BodyExplorer', embed: true,
+  },
+  {
+    id: 'esma', nome: 'Anatomy 3D Viewer (esma-dev-studio)', src: 'Comunidade · BodyParts3D + HuBMAP',
+    cov: '144 ossos, 160 músculos em 18 grupos, órgãos principais.',
+    feat: ['Camadas pele, osso, músculo, órgão', 'Clique com brilho e foco de câmera', 'Modo isolar', 'Busca por nome', 'Presets de câmera'],
+    lic: 'Código sem licença declarada · modelos CC BY-SA / CC BY', peso: 'leve',
+    url: 'https://esma-dev-studio.github.io/anatomy-3d-viewer/', repo: 'https://github.com/esma-dev-studio/anatomy-3d-viewer', embed: true,
+  },
+  {
+    id: 'hubmap', nome: 'HuBMAP Human Reference Atlas', src: 'NIH · visualizador montado pelo ENTROLABS',
+    cov: 'Órgãos de referência do corpo masculino: pele, cérebro, medula, coração, pulmões, fígado, rins, vasos, intestinos e mais. Sem esqueleto.',
+    feat: ['Modelos feitos por ilustrador médico e aprovados por especialistas', 'Liga e desliga cada órgão', 'Clique mostra o nome da estrutura', 'Pele transparente'],
+    lic: 'Modelos CC BY 4.0', peso: 'médio (carrega por órgão)',
+    url: './mostra/hubmap.html', repo: 'https://github.com/hubmapconsortium/ccf-releases/tree/main/v1.2/models', embed: true,
+  },
+  {
+    id: 'openanatomy', nome: 'Open Anatomy Browser (Harvard)', src: 'Brigham and Women’s Hospital / Harvard',
+    cov: 'Atlas por região: cérebro (300+ estruturas), abdome, joelho, cabeça e pescoço, ouvido interno.',
+    feat: ['3D com cortes de ressonância e tomografia', 'Hierarquia de estruturas', 'Não é corpo inteiro'],
+    lic: 'Licença livre (3D Slicer)', peso: '—',
+    url: 'https://www.openanatomy.org/atlas-pages/', repo: 'https://www.openanatomy.org/', embed: false, nota: 'site externo',
+  },
+  {
+    id: 'zanatomy', nome: 'Z-Anatomy (app)', src: 'Lluís Vinent · Unity',
+    cov: 'Atlas completo com rótulos e definições. O mais completo como atlas.',
+    feat: ['Isolar, rótulos, definições, busca', 'Inglês e espanhol', 'Windows e Android; versão web instável'],
+    lic: 'CC BY-SA 4.0', peso: '172 MB (instalador)',
+    url: 'https://github.com/LluisV/Z-Anatomy/releases/download/Beta/z-anatomy.exe', repo: 'https://github.com/LluisV/Z-Anatomy', embed: false, nota: 'download Windows',
+  },
+  {
+    id: 'atelier', nome: 'Anatomy Atelier (thebuggeddev)', src: 'Comunidade · Three.js + Next.js',
+    cov: 'Não documentado. Projeto inicial.',
+    feat: ['Demo fora do ar na última verificação'],
+    lic: 'Sem licença declarada', peso: '—',
+    url: 'https://anatomyatelier.vercel.app/', repo: 'https://github.com/thebuggeddev/anatomy', embed: false, nota: 'fora do ar', off: true,
+  },
+];
+
+const cards = document.getElementById('cards');
+for (const it of ITEMS) {
+  const c = document.createElement('article');
+  c.className = 'card'; c.id = 'card-' + it.id;
+  const badge = it.off ? '<span class="badge off">fora do ar</span>' : it.embed ? '<span class="badge ok">roda aqui</span>' : `<span class="badge warn">${it.nota}</span>`;
+  c.innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h3>${it.nome}</h3>${badge}</div>
+    <div class="src">${it.src}</div>
+    <div class="cov">${it.cov}</div>
+    <ul class="feat">${it.feat.map(f => `<li>${f}</li>`).join('')}</ul>
+    <div class="lic"><b>Licença:</b> ${it.lic} · <b>Peso:</b> ${it.peso}</div>
+    <div class="row">
+      ${it.embed ? `<button class="btn primary" data-open="${it.id}">Abrir aqui</button>` : ''}
+      <a class="btn" href="${it.url}" target="_blank" rel="noopener" ${it.off ? 'aria-disabled="true"' : ''}>${it.embed ? 'Nova aba' : it.nota === 'download Windows' ? 'Baixar' : 'Abrir'}</a>
+      <a class="btn" href="${it.repo}" target="_blank" rel="noopener">Código / fonte</a>
+    </div>`;
+  cards.appendChild(c);
+}
+
+const viewer = document.getElementById('viewer');
+const frame = document.getElementById('frame');
+const vload = document.getElementById('vload');
+function open(id) {
+  const it = ITEMS.find(i => i.id === id); if (!it) return;
+  document.getElementById('vtitle').textContent = it.nome;
+  document.getElementById('vlink').href = it.url;
+  vload.style.display = 'block';
+  frame.src = it.url;
+  viewer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.replaceState(null, '', '#' + id);
+}
+function close() {
+  viewer.classList.remove('open'); frame.src = 'about:blank';
+  document.body.style.overflow = ''; history.replaceState(null, '', location.pathname);
+}
+cards.addEventListener('click', (e) => { const b = e.target.closest('[data-open]'); if (b) open(b.dataset.open); });
+document.getElementById('close').addEventListener('click', close);
+frame.addEventListener('load', () => { if (frame.src !== 'about:blank') vload.style.display = 'none'; });
+if (location.hash) open(location.hash.slice(1));
+</script>
+</body>
+</html>
