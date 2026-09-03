@@ -213,15 +213,24 @@ function createViewer(container, ui) {
     const visible = meshes.filter(m => m.mesh.visible && !SETS[m.set].skin).map(m => m.mesh);
     const hits = raycaster.intersectObjects(visible, false);
     const hit = hits.find(h => clipPlane.distanceToPoint(h.point) >= 0);
-    select(hit ? hit.object.userData.entry : null);
+    select(hit ? hit.object.userData.entry : null, { x: e.clientX - r.left, y: e.clientY - r.top });
   });
 
-  function select(entry) {
+  // posição na tela do centro de uma estrutura (para o cartão flutuante)
+  function screenPosOf(entry) {
+    camera.updateMatrixWorld();
+    const box = new THREE.Box3().setFromObject(entry.mesh);
+    const c = box.getCenter(new THREE.Vector3()).project(camera);
+    const r = renderer.domElement.getBoundingClientRect();
+    return { x: (c.x + 1) / 2 * r.width, y: (1 - c.y) / 2 * r.height };
+  }
+
+  function select(entry, at) {
     if (selected) selected.mesh.material.color.copy(selected.base);
     selected = entry; selectedPin = null;
     if (selected && selected !== lmHost) selected.mesh.material.color.copy(HILITE);
     refreshPins();
-    ui.onSelect(selected ? describe(selected) : null);
+    ui.onSelect(selected ? describe(selected) : null, selected ? (at || screenPosOf(selected)) : null);
   }
   function selectPin(data) {
     if (selected !== data.host) { if (selected) selected.mesh.material.color.copy(selected.base); selected = data.host; if (selected !== lmHost) selected.mesh.material.color.copy(HILITE); }
@@ -245,9 +254,11 @@ function createViewer(container, ui) {
     const dir = camera.position.clone().sub(controls.target).normalize();
     controls.target.copy(c);
     camera.position.copy(c.clone().add(dir.multiplyScalar(Math.max(0.35, size * 2.2))));
+    controls.update();
+    ui.onSelect(describe(entry), screenPosOf(entry));
   }
   function applyVisibility() {
-    meshes.forEach(m => { m.mesh.visible = lmHost ? (m === lmHost) : (visibleSets[m.set] !== false && (!isolated || m === selected) && !m.hiddenByTree); });
+    meshes.forEach(m => { m.mesh.visible = lmHost ? (m === lmHost) : (visibleSets[m.set] !== false && (!isolated || m === selected) && !m.hiddenByTree && !m.hiddenByUser); });
     refreshPins();
   }
 
@@ -297,8 +308,16 @@ function createViewer(container, ui) {
     },
     focusOn,
     isolate() { if (!selected) return false; isolated = !isolated; applyVisibility(); return isolated; },
+    isolated() { return isolated; },
+    remove() {
+      if (!selected) return;
+      const e = selected; e.hiddenByUser = true; isolated = false;
+      select(null); applyVisibility();
+    },
+    restoreHidden() { meshes.forEach(m => m.hiddenByUser = false); applyVisibility(); },
+    hiddenCount() { return meshes.filter(m => m.hiddenByUser).length; },
     reset() {
-      isolated = false; meshes.forEach(m => { m.hiddenByTree = false; }); applyVisibility(); select(null);
+      isolated = false; meshes.forEach(m => { m.hiddenByTree = false; m.hiddenByUser = false; }); applyVisibility(); select(null);
       controls.target.set(0, 0, 0); camera.position.set(0, 0.2, 4.2); clipPlane.constant = 10;
     },
     setClip(t) { clipPlane.constant = t >= 1 ? 10 : (t * 2 - 1) * 0.6; },
@@ -348,8 +367,9 @@ const viewer = createViewer($('#three'), {
     bar.hidden = !name;
     if (name) $('#lmName').textContent = name + (side ? ` (${side})` : '');
   },
-  onSelect(d) {
+  onSelect(d, at) {
     $('#isolate').disabled = !d;
+    showPop(d, at);
     if (!d) { info.innerHTML = `<div class="info-empty">Toque numa estrutura do corpo, ou use a busca e a hierarquia.</div>`; return; }
     let h = `<div class="info"><div class="sys">${esc(d.set)}${d.pin ? ' · acidente ósseo' : ''}</div>`;
     h += `<h3>${esc(d.pt || d.en)}</h3><div class="sub">${[d.pt ? d.en : null, d.la].filter(Boolean).map(esc).join(' · ')}</div>`;
@@ -407,9 +427,29 @@ setsEl.addEventListener('change', async (e) => {
   if (e.target.checked) await ensureSet(k); else renderTreeSel();
 });
 
+// cartão flutuante ao lado da estrutura clicada
+const pop = $('#pop'), stage = $('.c3d-stage');
+function showPop(d, at) {
+  if (!d || !at || d.pin) { pop.hidden = true; return; }
+  $('#popName', pop).textContent = d.pt || d.en;
+  $('#popSub', pop).textContent = d.pt ? d.en : (d.la || '');
+  $('#popIso', pop).textContent = viewer.isolated() ? 'Mostrar tudo' : 'Isolar';
+  pop.hidden = false;
+  const W = stage.clientWidth, H = stage.clientHeight, pw = pop.offsetWidth, ph = pop.offsetHeight;
+  let x = at.x + 14, y = at.y - ph / 2;
+  if (x + pw > W - 8) x = at.x - pw - 14;
+  x = Math.max(8, x); y = Math.max(8, Math.min(H - ph - 8, y));
+  pop.style.left = x + 'px'; pop.style.top = y + 'px';
+}
+$('#popIso').addEventListener('click', () => { const on = viewer.isolate(); $('#isolate').textContent = on ? 'Mostrar tudo' : 'Isolar seleção'; $('#popIso').textContent = on ? 'Mostrar tudo' : 'Isolar'; });
+$('#popRem').addEventListener('click', () => { viewer.remove(); $('#isolate').textContent = 'Isolar seleção'; updateRestore(); });
+$('#popClose').addEventListener('click', () => { pop.hidden = true; });
+function updateRestore() { const n = viewer.hiddenCount(); const b = $('#restore'); b.hidden = n === 0; b.textContent = `Restaurar removidos (${n})`; }
+$('#restore').addEventListener('click', () => { viewer.restoreHidden(); updateRestore(); });
+
 // vista
-$('#reset').addEventListener('click', () => { viewer.exitLandmarks(); viewer.reset(); $('#isolate').textContent = 'Isolar seleção'; $('#clip').value = 100; treePath = []; renderTree(); });
-$('#isolate').addEventListener('click', (e) => { const on = viewer.isolate(); e.target.textContent = on ? 'Mostrar tudo' : 'Isolar seleção'; });
+$('#reset').addEventListener('click', () => { viewer.exitLandmarks(); viewer.reset(); $('#isolate').textContent = 'Isolar seleção'; $('#clip').value = 100; treePath = []; renderTree(); updateRestore(); });
+$('#isolate').addEventListener('click', (e) => { const on = viewer.isolate(); e.target.textContent = on ? 'Mostrar tudo' : 'Isolar seleção'; $('#popIso').textContent = on ? 'Mostrar tudo' : 'Isolar'; });
 $('#clip').addEventListener('input', (e) => viewer.setClip(e.target.value / 100));
 $('#allPins').addEventListener('change', (e) => viewer.setAllPins(e.target.checked));
 $('#lmBack').addEventListener('click', () => viewer.exitLandmarks());

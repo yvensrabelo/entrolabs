@@ -47,6 +47,7 @@
         <button class="btn" id="reset">Reiniciar vista</button>
         <button class="btn" id="isolate" disabled>Isolar seleção</button>
       </div>
+      <div class="row"><button class="btn" id="restore" hidden>Restaurar removidos</button></div>
     </div>
 
     <div class="blk">
@@ -65,6 +66,15 @@
       <button class="btn" id="lmBack">Voltar</button>
     </div>
     <div id="loader" class="loader"><div class="spin"></div><div id="loaderText">Carregando esqueleto…</div></div>
+    <div id="pop" class="pop" hidden>
+      <button class="pop-x" id="popClose" aria-label="Fechar">×</button>
+      <div class="pop-name" id="popName"></div>
+      <div class="pop-sub" id="popSub"></div>
+      <div class="pop-row">
+        <button class="btn" id="popIso">Isolar</button>
+        <button class="btn" id="popRem">Remover</button>
+      </div>
+    </div>
   </section>
 
   <aside class="c3d-side c3d-right" id="info">
