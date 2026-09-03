@@ -45,13 +45,6 @@ input[type=range] { width: 100%; accent-color: #111827; }
 .lm-bar { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px 6px 14px; display: flex; align-items: center; gap: 12px; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.06); white-space: nowrap; }
 .lm-bar[hidden] { display: none; }
 .lm-bar .btn { flex: none; padding: 5px 10px; }
-.pop { position: absolute; z-index: 3; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 180px; max-width: 240px; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
-.pop[hidden] { display: none; }
-.pop-x { position: absolute; right: 6px; top: 4px; border: 0; background: none; font-size: 16px; line-height: 1; color: var(--muted); cursor: pointer; padding: 2px 4px; }
-.pop-name { font-weight: 600; font-size: 14px; padding-right: 18px; }
-.pop-sub { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-.pop-row { display: flex; gap: 6px; }
-.pop-row .btn { padding: 5px 8px; font-size: 12px; }
 .btn[hidden] { display: none; }
 .loader { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; pointer-events: none; }
 .loader[hidden] { display: none; }
@@ -73,6 +66,7 @@ input[type=range] { width: 100%; accent-color: #111827; }
 .pinlist button:hover { border-color: #9ca3af; }
 .pinlist button.on { background: #111827; color: #fff; border-color: #111827; }
 .info .btn.wide { width: 100%; margin-top: 4px; }
+.info .acts { display: flex; gap: 6px; margin: 0 0 12px; }
 
 @media (max-width: 1000px) {
   .c3d { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
