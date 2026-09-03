@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ENTROLABS</title>
+<meta name="description" content="Experimentos interativos. Corpo humano: partes e sistemas.">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="./shared.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="./">ENTROLABS</a>
+  <nav class="tabs" aria-label="Experimentos">
+    <a class="tab on" href="./" aria-current="page">Corpo humano</a>
+  </nav>
+</header>
+
+<main class="app">
+  <aside class="side left">
+    <h2>Sistemas</h2>
+    <div class="chips" id="systems"></div>
+    <h2>Partes</h2>
+    <ul class="parts" id="parts"></ul>
+  </aside>
+
+  <section class="stage">
+    <div class="figure" id="figure"></div>
+    <div class="hint" id="hint">Toque em uma parte do corpo</div>
+  </section>
+
+  <aside class="side right" id="info">
+    <div class="info-empty">Selecione uma parte para ver o que ela faz.</div>
+  </aside>
+</main>
+
+<script type="module" src="./corpo.js"></script>
+</body>
+</html>
