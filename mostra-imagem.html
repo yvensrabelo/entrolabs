@@ -248,7 +248,22 @@ const FONTES = [
     desc: 'Radiografias PA do ChestX-ray14 (NIH) com a máscara do CheXmask sobreposta: pulmão direito, pulmão esquerdo e coração. Máscaras decodificadas do RLE oficial, sem edição. Atenção: as máscaras do CheXmask são geradas por modelo (HybridGNet) com controle de qualidade automático, não desenhadas à mão.',
     lic: 'CheXmask CC BY 4.0 · imagem NIH ChestX-ray14 sem restrição de uso, com atribuição', licurl: 'https://physionet.org/content/chexmask-cxr-segmentation-data/', fonte: 'https://physionet.org/content/chexmask-cxr-segmentation-data/',
     cit: 'Gaggion N, Mosquera C, Mansilla L, et al. CheXmask: a large-scale dataset of anatomical segmentation masks for multi-center chest x-ray images. Sci Data 2024;11:511 (PhysioNet v0.4). · Wang X, et al. ChestX-ray8. IEEE CVPR 2017. Imagem 00025722_002 fornecida pelo NIH Clinical Center (nihcc.app.box.com/v/ChestXray-NIHCC).',
-    tipo: 'chexmask', dir: './mostra/img/chexmask/',
+    tipo: 'mascaras', dir: './mostra/img/chexmask/',
+    legenda: [{ c: '#286EFF', t: 'pulmão direito' }, { c: '#28C85A', t: 'pulmão esquerdo' }, { c: '#E62828', t: 'coração' }],
+    nota: (man) => `${man.amostras.length} radiografias PA · Dice RCA médio acima de 0,90`,
+    cap: (o) => `${o.achados_nih === 'No Finding' ? 'sem achado (NIH)' : 'NIH: ' + o.achados_nih.replaceAll('|', ', ')}<small>${o.id_imagem} · ${o.sexo}, ${o.idade} anos · Dice ${String(o.dice_rca_mean).replace('.', ',')}</small>`,
+    capLb: (o) => `ChestX-ray14 ${o.id_imagem} (NIH Clinical Center), vista PA, rótulo NIH: ${o.achados_nih} · máscara CheXmask v0.4 (CC BY 4.0), Dice RCA médio ${o.dice_rca_mean}`,
+  },
+  {
+    id: 'jsrt', nome: 'JSRT + SCR', src: 'Sociedade Japonesa de Tecnologia Radiológica (247 radiografias PA) · contornos marcados à mão por dois observadores (van Ginneken, Stegmann e Loog, Utrecht)',
+    desc: 'Cinco estruturas por radiografia: pulmão direito, pulmão esquerdo, coração e as duas clavículas. Os contornos vêm dos arquivos de landmarks do SCR (Zenodo), sem nenhum ponto criado ou movido. As radiografias exibidas são as miniaturas de 256 px publicadas pelo autor do SCR, ampliadas só para exibição; as imagens JSRT completas (2048 px) exigem cadastro gratuito no site da JSRT.',
+    lic: 'SCR: CC BY 4.0 (Zenodo) · JSRT: pesquisa e ensino, sem uso comercial, cadastro obrigatório', licurl: 'https://doi.org/10.5281/zenodo.7056076', fonte: 'https://doi.org/10.5281/zenodo.7056076', fonte2: 'http://db.jsrt.or.jp/eng.php',
+    cit: 'van Ginneken B, Stegmann MB, Loog M. Segmentation of anatomical structures in chest radiographs using supervised methods: a comparative study on a public database. Med Image Anal 2006;10(1):19-40. · Shiraishi J, Katsuragawa S, Ikezoe J, et al. Development of a digital image database for chest radiographs with and without a lung nodule. AJR 2000;174(1):71-74.',
+    tipo: 'mascaras', dir: './mostra/img/jsrt/',
+    legenda: [{ c: '#286EFF', t: 'pulmão direito' }, { c: '#28C85A', t: 'pulmão esquerdo' }, { c: '#E62828', t: 'coração' }, { c: '#FFC828', t: 'clavícula direita' }, { c: '#FF8C28', t: 'clavícula esquerda' }],
+    nota: (man) => `${man.amostras.length} de ${man.n_casos_dataset} radiografias · contornos manuais`,
+    cap: (o) => `${o.grupo}<small>${o.id_imagem} · ${o.estruturas.length} estruturas</small>`,
+    capLb: (o) => `JSRT ${o.id_imagem} (${o.grupo}) · contornos SCR de ${o.estruturas.join(', ')} · SCR CC BY 4.0, JSRT para pesquisa e ensino`,
   },
 ];
 
@@ -285,25 +300,24 @@ for (const f of FONTES) {
       }
       box.appendChild(g);
     });
-  } else if (f.tipo === 'chexmask') {
+  } else if (f.tipo === 'mascaras') {
     fetch(f.dir + 'manifest.json').then(r => r.json()).then(man => {
       let modo = 'overlay';
       box.innerHTML = `<div class="cx">
-        <div class="legenda"><div class="seg" id="cxSeg"><button data-s="overlay" class="on">Com máscara</button><button data-s="original">Original</button></div>
-          <span><i style="background:#286EFF"></i>pulmão direito</span><span><i style="background:#28C85A"></i>pulmão esquerdo</span><span><i style="background:#E62828"></i>coração</span>
-          <span style="color:var(--muted)">${man.amostras.length} radiografias PA · Dice RCA médio acima de 0,90</span></div>
-        <div class="gal" id="cxGal"></div></div>`;
-      const g = box.querySelector('#cxGal');
-      const cap = (o) => `${o.achados_nih === 'No Finding' ? 'sem achado (NIH)' : 'NIH: ' + o.achados_nih.replaceAll('|', ', ')}<small>${o.id_imagem} · ${o.sexo}, ${o.idade} anos · Dice ${String(o.dice_rca_mean).replace('.', ',')}</small>`;
+        <div class="legenda"><div class="seg"><button data-s="overlay" class="on">Com máscara</button><button data-s="original">Original</button></div>
+          ${f.legenda.map(l => `<span><i style="background:${l.c}"></i>${l.t}</span>`).join('')}
+          <span style="color:var(--muted)">${f.nota(man)}</span></div>
+        <div class="gal"></div></div>`;
+      const g = box.querySelector('.gal');
       for (const o of man.amostras) {
         const fig = document.createElement('figure');
-        fig.innerHTML = `<img src="${f.dir + o[modo]}" loading="lazy" alt=""><figcaption>${cap(o)}</figcaption>`;
-        fig.addEventListener('click', () => openLb(f.dir + o[modo], `ChestX-ray14 ${o.id_imagem} (NIH Clinical Center), vista PA, rótulo NIH: ${o.achados_nih} · máscara CheXmask v0.4 (CC BY 4.0), Dice RCA médio ${o.dice_rca_mean}`));
+        fig.innerHTML = `<img src="${f.dir + o[modo]}" loading="lazy" alt=""><figcaption>${f.cap(o)}</figcaption>`;
+        fig.addEventListener('click', () => openLb(f.dir + o[modo], f.capLb(o)));
         g.appendChild(fig);
       }
-      box.querySelector('#cxSeg').addEventListener('click', (e) => {
+      box.querySelector('.seg').addEventListener('click', (e) => {
         const b = e.target.closest('button'); if (!b) return; modo = b.dataset.s;
-        box.querySelectorAll('#cxSeg button').forEach(x => x.classList.toggle('on', x === b));
+        box.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b));
         g.querySelectorAll('img').forEach((im, i) => im.src = f.dir + man.amostras[i][modo]);
       });
     });

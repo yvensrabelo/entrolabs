@@ -1,0 +1,153 @@
+{
+ "dataset": "JSRT (Japanese Society of Radiological Technology) + SCR (Segmentation in Chest Radiographs)",
+ "estruturas": [
+  "pulmão direito",
+  "pulmão esquerdo",
+  "coração",
+  "clavícula direita",
+  "clavícula esquerda"
+ ],
+ "n_casos_dataset": 247,
+ "origem_contornos": "Zenodo 7056076 (Bram van Ginneken, 2022), arquivo landmarks.zip: contornos fechados marcados manualmente por dois observadores (van Ginneken, Stegmann, Loog 2006), em coordenadas 1024x1024",
+ "origem_imagens": "Zenodo 7056076, arquivo jpg.zip: miniaturas de 256x256 das radiografias JSRT, publicadas pelo autor do SCR; aqui ampliadas para 768 px (bicúbico) só para exibição",
+ "imagens_completas": "As radiografias JSRT originais (2048x2048, 12 bits) exigem cadastro gratuito em http://db.jsrt.or.jp/eng.php e são para pesquisa e ensino, sem uso comercial (Shiraishi et al. 2000)",
+ "licenca_scr": "CC BY 4.0 (registro Zenodo)",
+ "licenca_jsrt": "uso em pesquisa e ensino, sem fins comerciais; cadastro obrigatório para as imagens completas",
+ "url_scr": "https://doi.org/10.5281/zenodo.7056076",
+ "url_jsrt": "http://db.jsrt.or.jp/eng.php",
+ "citacao": [
+  "van Ginneken B, Stegmann MB, Loog M. Segmentation of anatomical structures in chest radiographs using supervised methods: a comparative study on a public database. Med Image Anal 2006;10(1):19-40. doi:10.1016/j.media.2005.02.002",
+  "Shiraishi J, Katsuragawa S, Ikezoe J, et al. Development of a digital image database for chest radiographs with and without a lung nodule. AJR Am J Roentgenol 2000;174(1):71-74."
+ ],
+ "metodo": "contornos lidos de landmarks/<caso>.pfs (pulmões e coração com LineMode=ClosedContour; clavículas como contorno fechado implícito), reescalados 1024 -> 768 e desenhados como polígono (preenchimento leve em pulmões e coração, linha em todas as 5 estruturas); nenhum ponto foi criado ou movido",
+ "cores": {
+  "pulmão direito": "#286EFF",
+  "pulmão esquerdo": "#28C85A",
+  "coração": "#E62828",
+  "clavícula direita": "#FFC828",
+  "clavícula esquerda": "#FF8C28"
+ },
+ "amostras": [
+  {
+   "id_imagem": "JPCLN001",
+   "grupo": "com nódulo (JPCLN)",
+   "estruturas": [
+    "pulmão direito",
+    "pulmão esquerdo",
+    "coração",
+    "clavícula direita",
+    "clavícula esquerda"
+   ],
+   "n_pontos": {
+    "pulmão direito": 44,
+    "pulmão esquerdo": 50,
+    "coração": 26,
+    "clavícula direita": 23,
+    "clavícula esquerda": 23
+   },
+   "original": "JPCLN001_original.jpg",
+   "overlay": "JPCLN001_overlay.jpg"
+  },
+  {
+   "id_imagem": "JPCLN017",
+   "grupo": "com nódulo (JPCLN)",
+   "estruturas": [
+    "pulmão direito",
+    "pulmão esquerdo",
+    "coração",
+    "clavícula direita",
+    "clavícula esquerda"
+   ],
+   "n_pontos": {
+    "pulmão direito": 44,
+    "pulmão esquerdo": 50,
+    "coração": 26,
+    "clavícula direita": 23,
+    "clavícula esquerda": 23
+   },
+   "original": "JPCLN017_original.jpg",
+   "overlay": "JPCLN017_overlay.jpg"
+  },
+  {
+   "id_imagem": "JPCLN042",
+   "grupo": "com nódulo (JPCLN)",
+   "estruturas": [
+    "pulmão direito",
+    "pulmão esquerdo",
+    "coração",
+    "clavícula direita",
+    "clavícula esquerda"
+   ],
+   "n_pontos": {
+    "pulmão direito": 44,
+    "pulmão esquerdo": 50,
+    "coração": 26,
+    "clavícula direita": 23,
+    "clavícula esquerda": 23
+   },
+   "original": "JPCLN042_original.jpg",
+   "overlay": "JPCLN042_overlay.jpg"
+  },
+  {
+   "id_imagem": "JPCNN001",
+   "grupo": "sem nódulo (JPCNN)",
+   "estruturas": [
+    "pulmão direito",
+    "pulmão esquerdo",
+    "coração",
+    "clavícula direita",
+    "clavícula esquerda"
+   ],
+   "n_pontos": {
+    "pulmão direito": 44,
+    "pulmão esquerdo": 50,
+    "coração": 26,
+    "clavícula direita": 23,
+    "clavícula esquerda": 23
+   },
+   "original": "JPCNN001_original.jpg",
+   "overlay": "JPCNN001_overlay.jpg"
+  },
+  {
+   "id_imagem": "JPCNN023",
+   "grupo": "sem nódulo (JPCNN)",
+   "estruturas": [
+    "pulmão direito",
+    "pulmão esquerdo",
+    "coração",
+    "clavícula direita",
+    "clavícula esquerda"
+   ],
+   "n_pontos": {
+    "pulmão direito": 44,
+    "pulmão esquerdo": 50,
+    "coração": 26,
+    "clavícula direita": 23,
+    "clavícula esquerda": 23
+   },
+   "original": "JPCNN023_original.jpg",
+   "overlay": "JPCNN023_overlay.jpg"
+  },
+  {
+   "id_imagem": "JPCNN060",
+   "grupo": "sem nódulo (JPCNN)",
+   "estruturas": [
+    "pulmão direito",
+    "pulmão esquerdo",
+    "coração",
+    "clavícula direita",
+    "clavícula esquerda"
+   ],
+   "n_pontos": {
+    "pulmão direito": 44,
+    "pulmão esquerdo": 50,
+    "coração": 26,
+    "clavícula direita": 23,
+    "clavícula esquerda": 23
+   },
+   "original": "JPCNN060_original.jpg",
+   "overlay": "JPCNN060_overlay.jpg"
+  }
+ ],
+ "obtido_em": "2026-09-04"
+}
