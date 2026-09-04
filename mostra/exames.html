@@ -31,21 +31,12 @@
   .btn { padding: 7px 12px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; color: #111827; }
   .btn:hover { border-color: #9ca3af; }
   .btn.primary { background: #111827; color: #fff; border-color: #111827; }
-  .pin { position: absolute; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%; background: #fff; color: #111827; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 0 2px #111827, 0 1px 4px rgba(0,0,0,.5); }
-  .pin.hit { background: #10b981; color: #fff; box-shadow: 0 0 0 2px #fff; }
-  .pin.miss { background: #ef4444; color: #fff; box-shadow: 0 0 0 2px #fff; }
-  .tip { position: absolute; transform: translate(-50%, -140%); background: #fff; border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: 600; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
-  .mark { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; border: 2px solid #ef4444; pointer-events: none; }
-  .quiz { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; display: none; flex-direction: column; gap: 6px; }
-  .quiz.on { display: flex; }
-  .quiz .q { font-size: 14px; }
-  .quiz .q b { font-weight: 700; }
-  .quiz .r { color: #374151; min-height: 18px; }
-  .quiz .r.ok { color: #047857; } .quiz .r.bad { color: #b91c1c; }
-  .lista { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; font-size: 12px; color: #374151; }
-  .lista li b { font-weight: 600; color: #111827; margin-right: 4px; }
   .cred { font-size: 11px; color: #6b7280; margin-top: auto; padding-top: 8px; }
   .cred a { color: inherit; }
+  .zoomable { cursor: zoom-in; background: #fff; }
+  #lb { position: fixed; inset: 0; background: rgba(17,24,39,.92); display: none; overflow: auto; cursor: zoom-out; z-index: 9; }
+  #lb.on { display: block; }
+  #lb img { display: block; margin: 24px auto; max-width: none; width: min(1600px, 180vw); }
   @media (max-width: 760px) {
     #app { grid-template-columns: 1fr; }
     section + section { border-left: 0; border-top: 1px solid #e5e7eb; }
@@ -77,23 +68,12 @@
   </section>
 
   <section>
-    <h2>Radiografia de tórax PA — camada de anatomia</h2>
-    <p class="sub">Ligue os pinos para ver as estruturas ou use o modo “Encontre a estrutura” e clique onde ela está.</p>
-    <div class="stage" id="rxStage">
-      <img id="rx" src="./img/rx_torax.png" alt="Radiografia de tórax PA" draggable="false">
+    <h2>Radiografia de tórax PA — anatomia anotada por especialista</h2>
+    <p class="sub">Estruturas do mediastino rotuladas pelo autor da imagem (Mikael Häggström, M.D.). Clique para ampliar; nenhuma marcação foi acrescentada pelo ENTROLABS.</p>
+    <div class="stage zoomable" id="rxStage" title="Clique para ampliar">
+      <img id="rx" src="./img/haggstrom/torax_pa.jpg" alt="Radiografia de tórax PA com estruturas do mediastino rotuladas" draggable="false">
     </div>
-    <div class="row">
-      <button class="btn" id="rxToggle">Mostrar estruturas</button>
-      <button class="btn primary" id="rxQuiz">Encontre a estrutura</button>
-      <span id="rxScore" style="color:#6b7280"></span>
-    </div>
-    <div class="quiz" id="quiz">
-      <div class="q">Onde está: <b id="qName"></b>?</div>
-      <div class="r" id="qRes"></div>
-      <div class="row"><button class="btn" id="qNext">Próxima</button><button class="btn" id="qStop">Sair do modo</button></div>
-    </div>
-    <ul class="lista" id="rxList"></ul>
-    <div class="cred">Imagem: Wikimedia Commons, domínio público. Posições dos pinos definidas manualmente.</div>
+    <div class="cred">Imagem: <a href="https://commons.wikimedia.org/wiki/File:Mediastinal_structures_on_chest_X-ray,_annotated.jpg" target="_blank" rel="noopener">“Mediastinal structures on chest X-ray, annotated”</a>, Mikael Häggström, M.D. (sobre imagens de ZooFari, Stillwaterising e Gray’s Anatomy), Wikimedia Commons, <a href="https://creativecommons.org/licenses/by-sa/3.0" target="_blank" rel="noopener">CC BY-SA 3.0</a>.</div>
   </section>
 
 </div>
@@ -151,62 +131,11 @@ document.getElementById('ctWin').addEventListener('click', (e) => { const b = e.
 [wc, ww].forEach(r => r.addEventListener('input', () => { document.querySelectorAll('#ctWin button').forEach(b => b.classList.remove('on')); syncWin(); }));
 setWin('brain');
 
-/* ---------- RX ---------- */
-const RX_PINS = [
-  { n: 'Traqueia', x: 50, y: 18 },
-  { n: 'Clavícula esquerda', x: 66, y: 20 },
-  { n: 'Arco aórtico', x: 44, y: 34 },
-  { n: 'Hilo pulmonar direito', x: 40, y: 47 },
-  { n: 'Silhueta cardíaca', x: 52, y: 58 },
-  { n: 'Cúpula diafragmática direita', x: 34, y: 72 },
-  { n: 'Seio costofrênico direito', x: 24, y: 78 },
-  { n: 'Bolha gástrica', x: 66, y: 80 },
-];
-const rxStage = document.getElementById('rxStage'), rxImg = document.getElementById('rx');
-const rxList = document.getElementById('rxList'), quiz = document.getElementById('quiz');
-let pinsOn = false, quizOn = false, qIdx = -1, score = { ok: 0, n: 0 }, answered = false;
-rxList.innerHTML = RX_PINS.map((p, i) => `<li><b>${i + 1}</b>${p.n}</li>`).join('');
-
-function clearLayer() { rxStage.querySelectorAll('.pin, .tip, .mark').forEach(n => n.remove()); }
-function addPin(p, i, cls) {
-  const el = document.createElement('div'); el.className = 'pin' + (cls ? ' ' + cls : ''); el.textContent = i + 1;
-  el.style.left = p.x + '%'; el.style.top = p.y + '%';
-  el.addEventListener('click', (e) => { e.stopPropagation(); rxStage.querySelectorAll('.tip').forEach(n => n.remove()); const t = document.createElement('div'); t.className = 'tip'; t.textContent = p.n; t.style.left = p.x + '%'; t.style.top = p.y + '%'; rxStage.appendChild(t); });
-  rxStage.appendChild(el); return el;
-}
-function renderPins() { clearLayer(); if (pinsOn) RX_PINS.forEach((p, i) => addPin(p, i)); }
-document.getElementById('rxToggle').addEventListener('click', (e) => {
-  if (quizOn) stopQuiz();
-  pinsOn = !pinsOn; e.target.textContent = pinsOn ? 'Ocultar estruturas' : 'Mostrar estruturas'; renderPins();
-});
-
-function nextQ() {
-  let i; do { i = Math.floor(Math.random() * RX_PINS.length); } while (i === qIdx && RX_PINS.length > 1);
-  qIdx = i; answered = false; clearLayer();
-  document.getElementById('qName').textContent = RX_PINS[i].n;
-  const r = document.getElementById('qRes'); r.textContent = 'Clique na radiografia.'; r.className = 'r';
-}
-function startQuiz() {
-  quizOn = true; pinsOn = false; document.getElementById('rxToggle').textContent = 'Mostrar estruturas';
-  quiz.classList.add('on'); score = { ok: 0, n: 0 }; updScore(); nextQ();
-}
-function stopQuiz() { quizOn = false; quiz.classList.remove('on'); clearLayer(); }
-function updScore() { document.getElementById('rxScore').textContent = score.n ? `${score.ok} / ${score.n} acertos` : ''; }
-document.getElementById('rxQuiz').addEventListener('click', startQuiz);
-document.getElementById('qNext').addEventListener('click', nextQ);
-document.getElementById('qStop').addEventListener('click', stopQuiz);
-rxStage.addEventListener('click', (e) => {
-  if (!quizOn || answered) return;
-  const b = rxImg.getBoundingClientRect();
-  const x = (e.clientX - b.left) / b.width * 100, y = (e.clientY - b.top) / b.height * 100;
-  const p = RX_PINS[qIdx], d = Math.hypot(x - p.x, y - p.y);
-  answered = true; score.n++;
-  const ok = d < 7; if (ok) score.ok++; updScore();
-  const m = document.createElement('div'); m.className = 'mark'; m.style.left = x + '%'; m.style.top = y + '%'; rxStage.appendChild(m);
-  addPin(p, qIdx, ok ? 'hit' : 'miss');
-  const r = document.getElementById('qRes');
-  r.textContent = ok ? 'Certo.' : `Não. A estrutura está no pino marcado em vermelho.`; r.className = 'r ' + (ok ? 'ok' : 'bad');
-});
+/* ---------- RX: ampliar ---------- */
+const lb = document.createElement('div'); lb.id = 'lb'; lb.innerHTML = '<img alt="">'; document.body.appendChild(lb);
+document.getElementById('rxStage').addEventListener('click', () => { lb.querySelector('img').src = document.getElementById('rx').src; lb.classList.add('on'); });
+lb.addEventListener('click', () => lb.classList.remove('on'));
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') lb.classList.remove('on'); });
 </script>
 </body>
 </html>

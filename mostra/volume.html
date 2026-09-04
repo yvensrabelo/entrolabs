@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Volume com segmentação — NiiVue</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; color: #111827; font: 13px/1.4 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+  .bar { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; }
+  .bar .seg { display: inline-flex; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+  .bar .seg button { border: 0; background: #fff; padding: 5px 9px; cursor: pointer; font: inherit; color: #374151; border-right: 1px solid #e5e7eb; }
+  .bar .seg button:last-child { border-right: 0; }
+  .bar .seg button.on { background: #111827; color: #fff; }
+  .bar label { display: inline-flex; align-items: center; gap: 6px; color: #374151; }
+  .bar input[type=range] { width: 90px; accent-color: #111827; }
+  #stage { position: relative; min-height: 0; background: #000; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #tip { position: absolute; left: 10px; bottom: 10px; background: rgba(255,255,255,.95); border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 10px; max-width: 80%; pointer-events: none; }
+  #tip b { font-weight: 700; font-size: 14px; }
+  #tip small { color: #6b7280; display: block; }
+  #tip .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+  #msg { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: #fff; font-size: 13px; text-align: center; }
+  .cred { padding: 6px 10px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; }
+  .cred a { color: inherit; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bar">
+    <div class="seg" id="views">
+      <button data-v="multi" class="on">3 planos + 3D</button>
+      <button data-v="axial">Axial</button>
+      <button data-v="coronal">Coronal</button>
+      <button data-v="sagittal">Sagital</button>
+      <button data-v="render">3D</button>
+    </div>
+    <label>Segmentação <input type="range" id="op" min="0" max="100" value="55"></label>
+    <span id="n" style="color:#6b7280"></span>
+  </div>
+  <div id="stage"><canvas id="gl"></canvas><div id="msg">Carregando volume…</div><div id="tip" hidden></div></div>
+  <div class="cred" id="cred"></div>
+</div>
+<script type="module">
+import { Niivue } from 'https://cdn.jsdelivr.net/npm/@niivue/niivue@0.69.0/dist/index.js';
+
+const CASOS = {
+  totalseg: { dir: './data/totalseg/', nome: 'TotalSegmentator, caso s0235', cred: 'TC: TotalSegmentator dataset v2.0.1 (Wasserthal et al., 2023), Zenodo doi 10.5281/zenodo.6802613, CC BY 4.0. Máscaras originais do dataset, combinadas num mapa de rótulos sem edição.' },
+  verse:    { dir: './data/verse/',    nome: 'VerSe’19, caso verse015', cred: 'TC e máscara: VerSe (Sekuboyina et al., 2021; Löffler et al., 2020; Liebl et al., 2021), OSF, CC BY-SA 4.0. Rótulos originais do dataset, sem edição.' },
+};
+const caso = CASOS[new URLSearchParams(location.search).get('caso')] || CASOS.totalseg;
+document.getElementById('cred').textContent = caso.cred;
+
+const labels = await (await fetch(caso.dir + 'labels.json')).json();
+const ids = Object.keys(labels).map(Number); const maxId = Math.max(...ids);
+// paleta determinística (ângulo de ouro). O NiiVue interpola a LUT entre os índices 0 e 1, e a cor do
+// rótulo 1 vazaria para o fundo; por isso o volume é deslocado em +1 na memória (rótulo oficial k vira k+1)
+// e o índice 1 fica transparente. Os arquivos em disco continuam com os índices oficiais do dataset.
+const SH = 1;
+const cm = { R: [0, 0], G: [0, 0], B: [0, 0], A: [0, 0], I: [0, 1], labels: ['fundo', ''] };
+const col = {};
+for (let i = 1; i <= maxId; i++) {
+  const h = (i * 137.508) % 360, s = 0.65, l = 0.55;
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  const rgb = [r, g, b].map(v => Math.round((v + m) * 255));
+  cm.R.push(rgb[0]); cm.G.push(rgb[1]); cm.B.push(rgb[2]); cm.A.push(labels[i] ? 255 : 0); cm.I.push(i + SH); cm.labels.push(labels[i] || '');
+  col[i] = `rgb(${rgb.join(',')})`;
+}
+
+const tip = document.getElementById('tip'), msg = document.getElementById('msg');
+const nv = new Niivue({
+  
+  backColor: [0, 0, 0, 1], show3Dcrosshair: true, isColorbar: false, multiplanarForceRender: true,
+  dragAndDropEnabled: false, isOrientCube: true,
+});
+nv.onLocationChange = (d) => {
+    const v = d?.values?.[1]?.value; const id = Math.round(v ?? 0) - SH;
+    if (id > 0 && labels[id]) {
+      tip.hidden = false;
+      tip.innerHTML = `<span class="sw" style="background:${col[id]}"></span><b>${labels[id]}</b><small>rótulo ${id} · ${d.values[0] ? Math.round(d.values[0].value) + ' HU' : ''}</small>`;
+    } else if (d?.values?.[0]) {
+      tip.hidden = false; tip.innerHTML = `<b style="color:#6b7280;font-weight:500">sem rótulo</b><small>${Math.round(d.values[0].value)} HU</small>`;
+    }
+};
+await nv.attachToCanvas(document.getElementById('gl'));
+try {
+  await nv.loadVolumes([
+    { url: caso.dir + 'ct.nii.gz', colormap: 'gray', cal_min: -160, cal_max: 240 },
+    { url: caso.dir + 'seg.nii.gz', opacity: 0.55 },
+  ]);
+  const im = nv.volumes[1].img; for (let i = 0; i < im.length; i++) if (im[i]) im[i] += SH;
+  nv.volumes[1].global_max = maxId + SH; nv.volumes[1].cal_min = 0; nv.volumes[1].cal_max = maxId + SH;
+  nv.volumes[1].setColormapLabel(cm);
+  nv.updateGLVolume();
+  window.nv = nv;
+  nv.setSliceType(nv.sliceTypeMultiplanar);
+  nv.setMultiplanarLayout(2);
+  nv.setInterpolation(true);
+  msg.remove();
+  document.getElementById('n').textContent = `${ids.length} estruturas rotuladas · ${caso.nome} · clique ou arraste para ler o rótulo`;
+} catch (e) { msg.textContent = 'Não foi possível carregar o volume: ' + e.message; console.error(e); }
+
+document.getElementById('views').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#views button').forEach(x => x.classList.toggle('on', x === b));
+  const t = { multi: nv.sliceTypeMultiplanar, axial: nv.sliceTypeAxial, coronal: nv.sliceTypeCoronal, sagittal: nv.sliceTypeSagittal, render: nv.sliceTypeRender }[b.dataset.v];
+  nv.setSliceType(t);
+});
+document.getElementById('op').addEventListener('input', (e) => { if (nv.volumes[1]) nv.setOpacity(1, e.target.value / 100); });
+</script>
+</body>
+</html>

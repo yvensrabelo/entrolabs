@@ -1,0 +1,59 @@
+{
+ "caso_id": "verse015",
+ "dataset": "VerSe'19 (MICCAI 2019 challenge data structure, conjunto 01_training)",
+ "origem_url": "https://osf.io/nqjyw/ (componente \"VerSe 2019 (MICCAI challenge data structure)\", https://osf.io/923ap/, pasta 01_training)",
+ "arquivos_origem": {
+  "ct.nii.gz": {
+   "nome_original": "verse015.nii.gz",
+   "download": "https://osf.io/download/8rq4m/",
+   "sha256": "7281722bf488936a5b2a6cdbef7da24e8fecdc8a069c7528b61490311411936c"
+  },
+  "seg.nii.gz": {
+   "nome_original": "verse015_seg.nii.gz",
+   "download": "https://osf.io/download/7n8y4/",
+   "sha256_original": "e7261b075d476ecb4212cdd20b75221f06ac2cce92270e34761c18ab28d09293"
+  },
+  "centroides_original.json": {
+   "nome_original": "verse015_ctd.json",
+   "download": "https://osf.io/download/9gvck/"
+  }
+ },
+ "repositorio": "https://github.com/anjany/verse",
+ "licenca": "CC BY-SA 4.0",
+ "citacao": [
+  "Sekuboyina A, Husseini ME, Bayat A, et al. VerSe: A Vertebrae labelling and segmentation benchmark for multi-detector CT images. Medical Image Analysis. 2021;73:102166. doi:10.1016/j.media.2021.102166",
+  "Löffler MT, Sekuboyina A, Jacob A, et al. A Vertebral Segmentation Dataset with Fracture Grading. Radiology: Artificial Intelligence. 2020;2(4):e190138. doi:10.1148/ryai.2020190138",
+  "Liebl H, Schinz D, Sekuboyina A, et al. A computed tomography vertebral segmentation dataset with anatomical variations and multi-vendor scanner data. Scientific Data. 2021;8:284. doi:10.1038/s41597-021-01060-0"
+ ],
+ "dimensoes": [
+  291,
+  291,
+  58
+ ],
+ "espacamento_mm": [
+  1.0,
+  1.0,
+  2.0
+ ],
+ "orientacao_eixos": "PIR",
+ "tipo_dado_ct": "int16",
+ "faixa_hu": [
+  -1316,
+  3207
+ ],
+ "reamostrado": false,
+ "ct_modificada": false,
+ "mascara_modificada": false,
+ "mascara_tipo_dado": "convertida de float64 para uint8; valores dos rótulos e affine idênticos ao original (verificado voxel a voxel)",
+ "rotulos_presentes": {
+  "19": "T12",
+  "20": "L1",
+  "21": "L2",
+  "22": "L3",
+  "23": "L4",
+  "24": "L5"
+ },
+ "esquema_rotulos_verse": "1-7 C1-C7; 8-19 T1-T12; 20-25 L1-L6; 26 sacro; 28 T13 (readme oficial do VerSe)",
+ "centroides": "centroides_original.json: coordenadas em espaço ASL 1 mm isotrópico (estrutura MICCAI), campo label igual ao da máscara",
+ "obtido_em": "2026-09-03"
+}

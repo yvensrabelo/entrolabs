@@ -1,0 +1,22 @@
+{
+ "caso_id": "s0235",
+ "dataset": "TotalSegmentator dataset v2.0.1 (Wasserthal et al.)",
+ "zenodo": "https://doi.org/10.5281/zenodo.6802613",
+ "arquivo_zenodo": "Totalsegmentator_dataset_v201.zip (23,6 GB); só a pasta do caso foi lida, por HTTP Range",
+ "licenca": "CC BY 4.0",
+ "citacao": "Wasserthal J, Breit H-C, Meyer MT, et al. TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images. Radiology: Artificial Intelligence 2023;5(5):e230024. doi:10.1148/ryai.230024",
+ "dimensoes": [
+  202,
+  163,
+  245
+ ],
+ "espacamento_mm": [
+  1.5,
+  1.5,
+  1.5
+ ],
+ "ct_modificada": false,
+ "mascara": "as 117 máscaras binárias do caso foram combinadas num único mapa de rótulos uint8 usando os índices oficiais do TotalSegmentator (map_to_binary.py, classe \"total\"); nenhum voxel foi editado",
+ "estruturas_presentes": 68,
+ "obtido_em": "2026-09-03"
+}

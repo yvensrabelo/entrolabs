@@ -1,0 +1,57 @@
+[
+  {
+    "arquivo": "torax_pa.jpg",
+    "titulo_pt": "Radiografia de tórax PA com estruturas do mediastino rotuladas (coração, aorta, veias cavas, traqueia, esôfago, artérias e veias pulmonares, costelas numeradas)",
+    "commons_titulo": "File:Mediastinal structures on chest X-ray, annotated.jpg",
+    "pagina": "https://commons.wikimedia.org/wiki/File:Mediastinal_structures_on_chest_X-ray,_annotated.jpg",
+    "autor": "Mikael Häggström, M.D. (sobre imagens de ZooFari, Stillwaterising e Gray's Anatomy)",
+    "licenca": "CC BY-SA 3.0",
+    "licenca_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "largura": 1280,
+    "altura": 1038
+  },
+  {
+    "arquivo": "cervical_lateral.jpg",
+    "titulo_pt": "Radiografia lateral da coluna cervical com as linhas vertebrais rotuladas (anterior, posterior, espinolaminar e interespinhosa)",
+    "commons_titulo": "File:X-ray of vertebral lines.jpg",
+    "pagina": "https://commons.wikimedia.org/wiki/File:X-ray_of_vertebral_lines.jpg",
+    "autor": "Mikael Häggström, M.D.",
+    "licenca": "CC0 1.0",
+    "licenca_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "largura": 1285,
+    "altura": 1465
+  },
+  {
+    "arquivo": "pelve_quadril.jpg",
+    "titulo_pt": "Radiografia de pelve/quadril com linhas do acetábulo rotuladas (linha iliopectínea, linha ilioisquiática, lágrima, fossa acetabular, paredes anterior e posterior)",
+    "commons_titulo": "File:Iliopectineal line, ilioischial line, tear drop, acetabular fossa, and anterior and posterior wall of the acetabulumi.jpg",
+    "pagina": "https://commons.wikimedia.org/wiki/File:Iliopectineal_line,_ilioischial_line,_tear_drop,_acetabular_fossa,_and_anterior_and_posterior_wall_of_the_acetabulumi.jpg",
+    "autor": "Anotações de Mikael Häggström, M.D.; imagem-fonte de Ruiz Santiago F. et al.",
+    "licenca": "CC BY 4.0",
+    "licenca_url": "https://creativecommons.org/licenses/by/4.0",
+    "largura": 1320,
+    "altura": 1062
+  },
+  {
+    "arquivo": "tc_seios_coronal.png",
+    "titulo_pt": "TC de crânio (seios paranasais) em plano coronal com o complexo ostiomeatal rotulado (órbita, bolha etmoidal, hiato semilunar, processo uncinado, meato médio, conchas média e inferior, seio maxilar)",
+    "commons_titulo": "File:CT of the ostiomeatal complex, coronal plane, with annotations.png",
+    "pagina": "https://commons.wikimedia.org/wiki/File:CT_of_the_ostiomeatal_complex,_coronal_plane,_with_annotations.png",
+    "autor": "Mikael Häggström, M.D. (sobre imagens de Paşaoğlu L. et al. e User:Arcadian)",
+    "licenca": "CC BY 4.0",
+    "licenca_url": "https://creativecommons.org/licenses/by/4.0",
+    "largura": 1280,
+    "altura": 816
+  },
+  {
+    "arquivo": "tc_cervical_sagital.jpg",
+    "titulo_pt": "TC de coluna cervical em plano sagital com vértebras C1–C7 rotuladas e limite superior normal da espessura do espaço pré-vertebral em cada nível",
+    "commons_titulo": "File:CT of prevertebral space.jpg",
+    "pagina": "https://commons.wikimedia.org/wiki/File:CT_of_prevertebral_space.jpg",
+    "autor": "Mikael Häggström, M.D.",
+    "licenca": "CC0 1.0",
+    "licenca_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "largura": 860,
+    "altura": 1368
+  }
+]

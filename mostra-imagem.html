@@ -33,7 +33,47 @@
   .viewer .bar a { color: var(--muted); text-decoration: underline; }
   .viewer iframe { flex: 1; border: 0; width: 100%; }
   .viewer .loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--muted); font-size: 13px; pointer-events: none; }
-  @media (max-width: 900px) { .wrap { padding: 20px 16px 40px; } }
+  /* ---- fontes anotadas ---- */
+  .fontes { margin-top: 44px; }
+  .fontes h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .fontes > p.lead { color: var(--muted); max-width: 760px; margin-bottom: 12px; }
+  .fontes .regra { display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 999px; background: #fffbeb; color: #92400e; margin-bottom: 18px; }
+  .fcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 16px; }
+  .fcard { border: 1px solid var(--line); border-radius: 12px; padding: 18px; background: #fff; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .fcard.wide { grid-column: 1 / -1; }
+  .fcard .head { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+  .fcard h3 { font-size: 16px; }
+  .fcard .src { font-size: 12px; color: var(--muted); }
+  .fcard .desc { font-size: 13px; color: #374151; }
+  .fcard .amostra { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fafafa; }
+  .fcard iframe { display: block; width: 100%; height: 540px; border: 0; background: #000; }
+  .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; padding: 8px; }
+  .gal figure { margin: 0; cursor: zoom-in; }
+  .gal img { display: block; width: 100%; height: 170px; object-fit: contain; background: #111; border-radius: 6px; }
+  .gal figcaption { font-size: 11px; color: #374151; margin-top: 4px; line-height: 1.35; }
+  .gal figcaption small { color: var(--muted); display: block; }
+  .cx { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 8px; }
+  .cx .img { cursor: zoom-in; background: #111; border-radius: 6px; overflow: hidden; }
+  .cx img { display: block; width: 100%; max-height: 520px; object-fit: contain; }
+  .cx .legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #374151; align-items: center; }
+  .cx .legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; background: #fff; padding: 6px 10px; cursor: pointer; font: inherit; font-size: 13px; color: #374151; border-right: 1px solid var(--line); }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--text); color: #fff; }
+  .fcard .lic { font-size: 12px; color: #374151; border-top: 1px solid var(--line); padding-top: 10px; }
+  .fcard .lic b { font-weight: 600; }
+  .fcard .lic a { text-decoration: underline; color: inherit; }
+  .fcard .cit { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  #lb { position: fixed; inset: 0; background: rgba(17,24,39,.94); display: none; z-index: 20; overflow: auto; cursor: zoom-in; }
+  #lb.on { display: block; }
+  #lb img { display: block; margin: 20px auto 8px; max-width: calc(100% - 40px); max-height: calc(100vh - 90px); object-fit: contain; }
+  #lb.zoom { cursor: zoom-out; }
+  #lb.zoom img { max-width: none; max-height: none; width: max(200vw, 2000px); }
+  #lb .cap { color: #e5e7eb; font-size: 12px; text-align: center; padding: 0 20px 20px; max-width: 900px; margin: 0 auto; }
+  #lb .cap a { color: #fff; }
+  #lb .x { position: fixed; top: 60px; right: 16px; background: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  @media (max-width: 900px) { .wrap { padding: 20px 16px 40px; } .fcards { grid-template-columns: 1fr; } .fcard iframe { height: 420px; } }
 </style>
 </head>
 <body>
@@ -52,7 +92,16 @@
   <h1 style="font-size:22px;font-weight:700;margin-bottom:6px">Visualizadores abertos de exames de imagem</h1>
   <p class="lead">Candidatos a base do Simulador 02 (tomografia, ressonância, radiografia), cada um do jeito que o autor publicou. Os que aceitam ser embutidos abrem dentro desta página. Os demais abrem em nova aba.</p>
   <div class="cards" id="cards"></div>
+
+  <div class="fontes" id="fontes">
+    <h2>Fontes anotadas por especialistas</h2>
+    <p class="lead">Datasets e imagens abertos em que a anatomia ou o achado foi marcado por radiologistas ou por equipes clínicas, base para um simulador de imagem. Cada card mostra uma amostra real carregada aqui, com a anotação original.</p>
+    <span class="regra">Regra do ENTROLABS: nenhuma estrutura é marcada por nós. Tudo o que aparece anotado veio do autor ou do dataset.</span>
+    <div class="fcards" id="fcards"></div>
+  </div>
 </section>
+
+<div id="lb"><button class="x" id="lbx">Fechar</button><img alt=""><div class="cap"></div></div>
 
 <div class="viewer" id="viewer">
   <div class="bar">
@@ -70,9 +119,9 @@
 const ITEMS = [
   {
     id: 'exames', nome: 'Visualizador próprio (ENTROLABS)', src: 'Montado aqui · imagens do Wikimedia Commons',
-    cov: 'TC de crânio com 34 cortes axiais e radiografia de tórax PA com 8 estruturas marcadas.',
-    feat: ['Navegar cortes com roda, arraste, teclado ou controle', 'Janela: cérebro, partes moles, osso e ajuste manual', 'Rótulo do nível anatômico por faixa de cortes', 'Radiografia com pinos e modo “encontre a estrutura”'],
-    lic: 'TC CC BY-SA · RX domínio público', peso: 'leve (2 MB)',
+    cov: 'TC de crânio com 34 cortes axiais e radiografia de tórax PA com o mediastino anotado por especialista (Häggström, Commons).',
+    feat: ['Navegar cortes com roda, arraste, teclado ou controle', 'Janela: cérebro, partes moles, osso e ajuste manual', 'Rótulo do nível anatômico por faixa de cortes', 'Radiografia anotada pelo autor, com ampliação; nenhuma marcação nossa'],
+    lic: 'TC CC BY-SA · RX CC BY-SA 3.0', peso: 'leve (1,5 MB)',
     url: './mostra/exames.html', repo: 'https://github.com/yvensrabelo/entrolabs',
     abrir: [{ t: 'Abrir aqui', url: './mostra/exames.html' }],
   },
@@ -160,6 +209,93 @@ cards.addEventListener('click', (e) => { const b = e.target.closest('[data-open]
 document.getElementById('close').addEventListener('click', close);
 frame.addEventListener('load', () => { if (frame.src !== 'about:blank') vload.style.display = 'none'; });
 if (location.hash) { const [id, i] = location.hash.slice(1).split('-'); open(id, +(i || 0)); }
+
+/* ---------------- Fontes anotadas por especialistas ---------------- */
+const FONTES = [
+  {
+    id: 'haggstrom', nome: 'Wikimedia Commons · Mikael Häggström, “Medical image annotations”', src: 'Radiologista sueco; coleção de imagens com anatomia rotulada no próprio arquivo',
+    desc: 'Radiografias e TC com estruturas nomeadas pelo autor. Clique numa imagem para ampliar; na ampliação, clique de novo para ver em tamanho real.',
+    lic: 'CC BY-SA 3.0 na maior parte; algumas CC BY 4.0 ou CC0 (indicado em cada imagem)', licurl: 'https://creativecommons.org/licenses/by-sa/3.0/', fonte: 'https://commons.wikimedia.org/wiki/Category:Mikael_H%C3%A4ggstr%C3%B6m/Medical_image_annotations',
+    cit: 'Häggström, Mikael. Medical image annotations. Wikimedia Commons. Atribuição a Mikael Häggström, M.D., e aos autores das imagens-fonte citados em cada arquivo.',
+    tipo: 'galeria', manifest: './mostra/img/haggstrom/manifest.json', dir: './mostra/img/haggstrom/',
+    cap: (o) => `${o.titulo_pt}<small>${o.autor} · ${o.licenca}</small>`,
+    capLb: (o) => `${o.titulo_pt} — ${o.autor} · <a href="${o.pagina}" target="_blank" rel="noopener">${o.commons_titulo}</a> · <a href="${o.licenca_url}" target="_blank" rel="noopener">${o.licenca}</a>`,
+  },
+  {
+    id: 'totalseg', nome: 'TotalSegmentator dataset', src: 'Hospital Universitário de Basileia · 1.228 TC com 117 estruturas segmentadas e revisadas manualmente', wide: true,
+    desc: 'Caso s0235 (abdome e pelve, 68 estruturas presentes) carregado no NiiVue com as máscaras do dataset combinadas num mapa de rótulos. Clique ou arraste num plano: o rótulo sob o cursor aparece no canto (fígado, rim direito, vértebra L3…).',
+    lic: 'CC BY 4.0', licurl: 'https://creativecommons.org/licenses/by/4.0/', fonte: 'https://doi.org/10.5281/zenodo.6802613',
+    cit: 'Wasserthal J, Breit H-C, Meyer MT, et al. TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images. Radiology: Artificial Intelligence 2023;5(5):e230024. Dataset v2.0.1, Zenodo. Só a pasta do caso foi lida do ZIP de 23,6 GB (HTTP Range); as 117 máscaras binárias foram combinadas num único mapa com os índices oficiais, sem editar voxels.',
+    tipo: 'iframe', url: './mostra/volume.html?caso=totalseg',
+  },
+  {
+    id: 'verse', nome: 'VerSe — Large Scale Vertebrae Segmentation Challenge', src: 'TU Munique e parceiros · TC de coluna com cada vértebra segmentada e rotulada por especialistas', wide: true,
+    desc: 'Caso verse015 (VerSe’19, treino): TC sagital toracolombar com T12 e L1–L5 segmentadas e rotuladas. Clique numa vértebra para ler o nível.',
+    lic: 'CC BY-SA 4.0', licurl: 'https://creativecommons.org/licenses/by-sa/4.0/', fonte: 'https://github.com/anjany/verse',
+    cit: 'Sekuboyina A, et al. VerSe: A Vertebrae labelling and segmentation benchmark for multi-detector CT images. Med Image Anal 2021;73:102166. Löffler MT, et al. Radiol Artif Intell 2020;2(4):e190138. Liebl H, et al. Sci Data 2021;8:284. Dados no OSF (osf.io/nqjyw); máscara original, só convertida de float64 para uint8.',
+    tipo: 'iframe', url: './mostra/volume.html?caso=verse',
+  },
+  {
+    id: 'fraturas', nome: 'GRAZPEDWRI-DX e FracAtlas', src: 'Graz (Áustria): radiografias de punho pediátrico anotadas por radiologistas pediátricos · Bangladesh: radiografias musculoesqueléticas anotadas por equipe clínica',
+    desc: 'Caixas de anotação do próprio dataset desenhadas sobre as imagens (vermelho: fratura; verde: sinal do pronador; cinza: texto na imagem). Coordenadas lidas direto dos arquivos YOLO, sem ajuste.',
+    lic: 'CC BY 4.0 (ambos)', licurl: 'https://creativecommons.org/licenses/by/4.0/', fonte: 'https://doi.org/10.6084/m9.figshare.14825193', fonte2: 'https://doi.org/10.6084/m9.figshare.22363012',
+    cit: 'Nagy E, Janisch M, Hržić F, Sorantin E, Tschauner S. A pediatric wrist trauma X-ray dataset (GRAZPEDWRI-DX) for machine learning. Sci Data 2022;9:222. · Abedeen I, Rahman MA, Prottyasha FZ, Ahmed T, Mohmud TM, Shatabda S. FracAtlas: A Dataset for Fracture Classification, Localization and Segmentation of Musculoskeletal Radiographs. Sci Data 2023;10:521.',
+    tipo: 'galeria', manifest: './mostra/img/fraturas/manifest.json', dir: './mostra/img/fraturas/',
+    cap: (o) => `${o.dataset} · ${o.regiao}${o.projecao ? ', ' + o.projecao : ''}<small>${o.classes.join(', ')} · ${o.n_caixas} caixa${o.n_caixas > 1 ? 's' : ''} · ${o.id_original}</small>`,
+    capLb: (o) => `${o.dataset} · ${o.regiao}${o.projecao ? ', ' + o.projecao : ''} · ${o.id_original} · caixas do dataset: ${o.classes.join(', ')} · CC BY 4.0`,
+  },
+  {
+    id: 'chexmask', nome: 'CheXmask', src: 'CONICET / Univ. Nacional del Litoral (Argentina) · máscaras de pulmões e coração para 657 mil radiografias, com controle de qualidade',
+    desc: 'Radiografia PA do ChestX-ray14 (NIH) com a máscara do CheXmask sobreposta: pulmão direito, pulmão esquerdo e coração. Máscara decodificada do RLE oficial, sem edição.',
+    lic: 'CheXmask CC BY 4.0 · imagem NIH ChestX-ray14 sem restrição de uso, com atribuição', licurl: 'https://physionet.org/content/chexmask-cxr-segmentation-data/', fonte: 'https://physionet.org/content/chexmask-cxr-segmentation-data/',
+    cit: 'Gaggion N, Mosquera C, Mansilla L, et al. CheXmask: a large-scale dataset of anatomical segmentation masks for multi-center chest x-ray images. Sci Data 2024;11:511 (PhysioNet v0.4). · Wang X, et al. ChestX-ray8. IEEE CVPR 2017. Imagem 00025722_002 fornecida pelo NIH Clinical Center (nihcc.app.box.com/v/ChestXray-NIHCC).',
+    tipo: 'chexmask', dir: './mostra/img/chexmask/',
+  },
+];
+
+const fcards = document.getElementById('fcards');
+const lb = document.getElementById('lb'), lbImg = lb.querySelector('img'), lbCap = lb.querySelector('.cap');
+function openLb(src, cap) { lbImg.src = src; lbCap.innerHTML = cap || ''; lb.classList.add('on'); lb.classList.remove('zoom'); document.body.style.overflow = 'hidden'; }
+function closeLb() { lb.classList.remove('on', 'zoom'); lbImg.src = ''; document.body.style.overflow = ''; }
+lb.addEventListener('click', (e) => { if (e.target === lbImg) lb.classList.toggle('zoom'); else if (e.target.tagName !== 'A') closeLb(); });
+document.getElementById('lbx').addEventListener('click', closeLb);
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
+const semProto = (u) => u.replace(/^https?:\/\//, '');
+
+for (const f of FONTES) {
+  const c = document.createElement('article'); c.className = 'fcard' + (f.wide ? ' wide' : ''); c.id = 'fonte-' + f.id;
+  c.innerHTML = `
+    <div class="head"><h3>${f.nome}</h3><span class="badge ok">amostra aqui</span></div>
+    <div class="src">${f.src}</div>
+    <div class="desc">${f.desc}</div>
+    <div class="amostra"></div>
+    <div class="lic"><b>Licença:</b> <a href="${f.licurl}" target="_blank" rel="noopener">${f.lic}</a> · <b>Fonte:</b> <a href="${f.fonte}" target="_blank" rel="noopener">${semProto(f.fonte)}</a>${f.fonte2 ? ` · <a href="${f.fonte2}" target="_blank" rel="noopener">${semProto(f.fonte2)}</a>` : ''}</div>
+    <div class="cit">${f.cit}</div>`;
+  fcards.appendChild(c);
+  const box = c.querySelector('.amostra');
+  if (f.tipo === 'iframe') {
+    box.innerHTML = `<iframe src="${f.url}" loading="lazy" title="${f.nome}"></iframe>`;
+  } else if (f.tipo === 'galeria') {
+    fetch(f.manifest).then(r => r.json()).then(list => {
+      const g = document.createElement('div'); g.className = 'gal';
+      for (const o of list) {
+        const fig = document.createElement('figure');
+        fig.innerHTML = `<img src="${f.dir + o.arquivo}" loading="lazy" alt=""><figcaption>${f.cap(o)}</figcaption>`;
+        fig.addEventListener('click', () => openLb(f.dir + o.arquivo, f.capLb(o)));
+        g.appendChild(fig);
+      }
+      box.appendChild(g);
+    });
+  } else if (f.tipo === 'chexmask') {
+    box.innerHTML = `<div class="cx">
+      <div class="seg" id="cxSeg"><button data-s="overlay.jpg" class="on">Com máscara</button><button data-s="original.jpg">Original</button></div>
+      <div class="img"><img id="cxImg" src="${f.dir}overlay.jpg" alt="Radiografia de tórax PA com máscara do CheXmask"></div>
+      <div class="legenda"><span><i style="background:#286EFF"></i>pulmão direito</span><span><i style="background:#28C85A"></i>pulmão esquerdo</span><span><i style="background:#E62828"></i>coração</span><span style="color:var(--muted)">Dice RCA médio 0,90 · vista PA · 1024 px</span></div>
+    </div>`;
+    box.querySelector('#cxSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; box.querySelectorAll('#cxSeg button').forEach(x => x.classList.toggle('on', x === b)); box.querySelector('#cxImg').src = f.dir + b.dataset.s; });
+    box.querySelector('.img').addEventListener('click', () => openLb(box.querySelector('#cxImg').src, 'ChestX-ray14 00025722_002 (NIH Clinical Center) com máscara CheXmask v0.4 (CC BY 4.0)'));
+  }
+}
 </script>
 </body>
 </html>
