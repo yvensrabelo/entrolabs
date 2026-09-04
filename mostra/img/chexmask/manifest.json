@@ -1,36 +1,182 @@
 {
-  "id_imagem": "00025722_002.png",
-  "dataset_origem": "ChestX-ray14 (NIH Clinical Center, ChestX-ray8/14)",
-  "vista": "PA",
-  "achados_nih": "No Finding",
-  "dimensoes_px": [
-    1024,
-    1024
-  ],
-  "chexmask_versao": "0.4",
-  "chexmask_arquivo": "OriginalResolution/ChestX-Ray8.csv",
-  "dice_rca": {
-    "mean": 0.9028451648750256,
-    "max": 0.9268566155792162
+ "id_imagem": "00025722_002.png",
+ "dataset_origem": "ChestX-ray14 (NIH Clinical Center, ChestX-ray8/14)",
+ "vista": "PA",
+ "achados_nih": "No Finding",
+ "dimensoes_px": [
+  1024,
+  1024
+ ],
+ "chexmask_versao": "0.4",
+ "chexmask_arquivo": "OriginalResolution/ChestX-Ray8.csv",
+ "dice_rca": {
+  "mean": 0.9028451648750256,
+  "max": 0.9268566155792162
+ },
+ "url_chexmask": "https://physionet.org/content/chexmask-cxr-segmentation-data/0.4/",
+ "url_chexmask_csv": "https://physionet.org/files/chexmask-cxr-segmentation-data/0.4/OriginalResolution/ChestX-Ray8.csv",
+ "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00025722_002.png",
+ "url_imagem_oficial": "https://nihcc.app.box.com/v/ChestXray-NIHCC",
+ "licenca_chexmask": "CC BY 4.0",
+ "licenca_imagem": "There are no restrictions on the use of the NIH chest x-ray images. However, the dataset has the following attribution requirements: Provide a link to the NIH download site: https://nihcc.app.box.com/v/ChestXray-NIHCC; Include a citation to the CVPR 2017 paper; Acknowledge that the NIH Clinical Center is the data provider",
+ "licenca_imagem_fonte": "Texto do NIH Clinical Center (página de download no Box), reproduzido no README do espelho Hugging Face alkzar90/NIH-Chest-X-ray-dataset",
+ "decodificacao_rle": "get_mask_from_RLE de DataPostprocessing/utils.py (github.com/ngaggion/CheXmask-Database): pares 'inicio comprimento', indice plano 1-indexado, ordem de linha, reshape (altura, largura). Mascaras usadas sem qualquer edicao.",
+ "cores_overlay": {
+  "pulmao_direito": "#286EFF (azul)",
+  "pulmao_esquerdo": "#28C85A (verde)",
+  "coracao": "#E62828 (vermelho)",
+  "alfa": 0.38
+ },
+ "citacao": [
+  "Gaggion N, Mosquera C, Mansilla L, Saidman JM, Aineseder M, Milone DH, Ferrante E. CheXmask: a large-scale dataset of anatomical segmentation masks for multi-center chest x-ray images. Scientific Data 11, 511 (2024). https://doi.org/10.1038/s41597-024-03358-1",
+  "Gaggion N, Mosquera C, Aineseder M, Mansilla L, Milone DH, Ferrante E. CheXmask Database: a large-scale dataset of anatomical segmentation masks for chest x-ray images (version 0.4). PhysioNet. RRID:SCR_007345. https://doi.org/10.13026/pgag-by42",
+  "Goldberger A, Amaral L, Glass L, et al. PhysioBank, PhysioToolkit, and PhysioNet: Components of a new research resource for complex physiologic signals. Circulation 101(23):e215-e220 (2000).",
+  "Wang X, Peng Y, Lu L, Lu Z, Bagheri M, Summers RM. ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases. IEEE CVPR 2017, pp. 3462-3471. Dados fornecidos pelo NIH Clinical Center."
+ ],
+ "amostras": [
+  {
+   "tag": "01",
+   "id_imagem": "00025722_002.png",
+   "vista": "PA",
+   "achados_nih": "No Finding",
+   "idade": "53",
+   "sexo": "F",
+   "dice_rca_mean": 0.9028,
+   "dice_rca_max": 0.9269,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00025722_002.png",
+   "original": "original.jpg",
+   "overlay": "overlay.jpg"
   },
-  "url_chexmask": "https://physionet.org/content/chexmask-cxr-segmentation-data/0.4/",
-  "url_chexmask_csv": "https://physionet.org/files/chexmask-cxr-segmentation-data/0.4/OriginalResolution/ChestX-Ray8.csv",
-  "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00025722_002.png",
-  "url_imagem_oficial": "https://nihcc.app.box.com/v/ChestXray-NIHCC",
-  "licenca_chexmask": "CC BY 4.0",
-  "licenca_imagem": "There are no restrictions on the use of the NIH chest x-ray images. However, the dataset has the following attribution requirements: Provide a link to the NIH download site: https://nihcc.app.box.com/v/ChestXray-NIHCC; Include a citation to the CVPR 2017 paper; Acknowledge that the NIH Clinical Center is the data provider",
-  "licenca_imagem_fonte": "Texto do NIH Clinical Center (página de download no Box), reproduzido no README do espelho Hugging Face alkzar90/NIH-Chest-X-ray-dataset",
-  "decodificacao_rle": "get_mask_from_RLE de DataPostprocessing/utils.py (github.com/ngaggion/CheXmask-Database): pares 'inicio comprimento', indice plano 1-indexado, ordem de linha, reshape (altura, largura). Mascaras usadas sem qualquer edicao.",
-  "cores_overlay": {
-    "pulmao_direito": "#286EFF (azul)",
-    "pulmao_esquerdo": "#28C85A (verde)",
-    "coracao": "#E62828 (vermelho)",
-    "alfa": 0.38
+  {
+   "tag": "02",
+   "id_imagem": "00027342_000.png",
+   "vista": "PA",
+   "achados_nih": "Cardiomegaly|Effusion",
+   "idade": "60",
+   "sexo": "F",
+   "dice_rca_mean": 0.9078,
+   "dice_rca_max": 0.9463,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00027342_000.png",
+   "original": "02_original.jpg",
+   "overlay": "02_overlay.jpg"
   },
-  "citacao": [
-    "Gaggion N, Mosquera C, Mansilla L, Saidman JM, Aineseder M, Milone DH, Ferrante E. CheXmask: a large-scale dataset of anatomical segmentation masks for multi-center chest x-ray images. Scientific Data 11, 511 (2024). https://doi.org/10.1038/s41597-024-03358-1",
-    "Gaggion N, Mosquera C, Aineseder M, Mansilla L, Milone DH, Ferrante E. CheXmask Database: a large-scale dataset of anatomical segmentation masks for chest x-ray images (version 0.4). PhysioNet. RRID:SCR_007345. https://doi.org/10.13026/pgag-by42",
-    "Goldberger A, Amaral L, Glass L, et al. PhysioBank, PhysioToolkit, and PhysioNet: Components of a new research resource for complex physiologic signals. Circulation 101(23):e215-e220 (2000).",
-    "Wang X, Peng Y, Lu L, Lu Z, Bagheri M, Summers RM. ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases. IEEE CVPR 2017, pp. 3462-3471. Dados fornecidos pelo NIH Clinical Center."
-  ]
+  {
+   "tag": "03",
+   "id_imagem": "00027407_000.png",
+   "vista": "PA",
+   "achados_nih": "Infiltration",
+   "idade": "28",
+   "sexo": "M",
+   "dice_rca_mean": 0.9048,
+   "dice_rca_max": 0.9399,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00027407_000.png",
+   "original": "03_original.jpg",
+   "overlay": "03_overlay.jpg"
+  },
+  {
+   "tag": "04",
+   "id_imagem": "00028070_000.png",
+   "vista": "PA",
+   "achados_nih": "Mass",
+   "idade": "70",
+   "sexo": "F",
+   "dice_rca_mean": 0.9027,
+   "dice_rca_max": 0.9125,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00028070_000.png",
+   "original": "04_original.jpg",
+   "overlay": "04_overlay.jpg"
+  },
+  {
+   "tag": "05",
+   "id_imagem": "00026144_006.png",
+   "vista": "PA",
+   "achados_nih": "Infiltration",
+   "idade": "46",
+   "sexo": "M",
+   "dice_rca_mean": 0.9016,
+   "dice_rca_max": 0.9345,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00026144_006.png",
+   "original": "05_original.jpg",
+   "overlay": "05_overlay.jpg"
+  },
+  {
+   "tag": "06",
+   "id_imagem": "00026828_023.png",
+   "vista": "PA",
+   "achados_nih": "Atelectasis|Effusion",
+   "idade": "52",
+   "sexo": "M",
+   "dice_rca_mean": 0.901,
+   "dice_rca_max": 0.9299,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00026828_023.png",
+   "original": "06_original.jpg",
+   "overlay": "06_overlay.jpg"
+  },
+  {
+   "tag": "07",
+   "id_imagem": "00025718_000.png",
+   "vista": "PA",
+   "achados_nih": "No Finding",
+   "idade": "50",
+   "sexo": "M",
+   "dice_rca_mean": 0.9171,
+   "dice_rca_max": 0.9443,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00025718_000.png",
+   "original": "07_original.jpg",
+   "overlay": "07_overlay.jpg"
+  },
+  {
+   "tag": "08",
+   "id_imagem": "00027809_001.png",
+   "vista": "PA",
+   "achados_nih": "No Finding",
+   "idade": "40",
+   "sexo": "F",
+   "dice_rca_mean": 0.9094,
+   "dice_rca_max": 0.9271,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00027809_001.png",
+   "original": "08_original.jpg",
+   "overlay": "08_overlay.jpg"
+  },
+  {
+   "tag": "09",
+   "id_imagem": "00025009_000.png",
+   "vista": "PA",
+   "achados_nih": "No Finding",
+   "idade": "33",
+   "sexo": "M",
+   "dice_rca_mean": 0.9082,
+   "dice_rca_max": 0.936,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00025009_000.png",
+   "original": "09_original.jpg",
+   "overlay": "09_overlay.jpg"
+  },
+  {
+   "tag": "10",
+   "id_imagem": "00025819_000.png",
+   "vista": "PA",
+   "achados_nih": "No Finding",
+   "idade": "41",
+   "sexo": "F",
+   "dice_rca_mean": 0.9081,
+   "dice_rca_max": 0.937,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00025819_000.png",
+   "original": "10_original.jpg",
+   "overlay": "10_overlay.jpg"
+  },
+  {
+   "tag": "11",
+   "id_imagem": "00026349_001.png",
+   "vista": "PA",
+   "achados_nih": "No Finding",
+   "idade": "46",
+   "sexo": "M",
+   "dice_rca_mean": 0.9078,
+   "dice_rca_max": 0.9326,
+   "url_imagem": "https://huggingface.co/datasets/iraqigold/nih-chest-xray-14-flat/resolve/main/images_011/images/00026349_001.png",
+   "original": "11_original.jpg",
+   "overlay": "11_overlay.jpg"
+  }
+ ],
+ "metodo_selecao": "primeiros 60 MB do CSV OriginalResolution/ChestX-Ray8.csv lidos por HTTP Range; vista PA conforme Data_Entry_2017.csv do NIH; Dice RCA médio > 0,9; um paciente por amostra; metade com achado NIH, metade \"No Finding\""
 }
